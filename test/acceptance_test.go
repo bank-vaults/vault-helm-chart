@@ -30,7 +30,8 @@ import (
 )
 
 var (
-	vaultVersion = "latest"
+	vaultVersion      = "latest"
+	bankVaultsVersion = "1.19.0"
 )
 
 // Installing the operator helm chart before testing
@@ -55,7 +56,7 @@ func TestVaultHelmChart(t *testing.T) {
 	options := &helm.Options{
 		KubectlOptions: kubectlOptions,
 		SetValues: map[string]string{
-			"unsealer.image.tag": "latest",
+			"unsealer.image.tag": bankVaultsVersion,
 			"unsealer.args[0]":   "--mode",
 			"unsealer.args[1]":   "k8s",
 			"unsealer.args[2]":   "--k8s-secret-namespace",
