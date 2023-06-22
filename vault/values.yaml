@@ -245,7 +245,7 @@ vault:
 unsealer:
   image:
     repository: ghcr.io/banzaicloud/bank-vaults
-    # tag: ""
+    tag: "1.19.0"
     pullPolicy: IfNotPresent
   args:
     [
