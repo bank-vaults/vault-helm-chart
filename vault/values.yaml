@@ -10,7 +10,7 @@ strategy:
   type: RollingUpdate
 image:
   repository: vault
-  tag: 1.6.2
+  tag: 1.13.3
   pullPolicy: IfNotPresent
 
 service:
@@ -245,7 +245,7 @@ vault:
 unsealer:
   image:
     repository: ghcr.io/banzaicloud/bank-vaults
-    # tag: ""
+    tag: "1.19.0"
     pullPolicy: IfNotPresent
   args:
     [
