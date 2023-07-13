@@ -129,11 +129,19 @@ extraContainerVolumes: []
 # - name: empty-dir-volume
 #   emptyDir: {}
 
-# Specify a secret which holds your custom TLS certificate.
-# If not specified Helm will generate one for you.
-# See templates/secret.yaml for the exact format.
 tls:
+  # Specify a secret which holds your custom TLS certificate.
+  # If not specified Helm will generate one for you.
+  # See templates/secret.yaml for the exact format.
   secretName: ""
+
+  # Allows using TLS to pull Vault secrets from other namespaces
+  # You can pass a list of namespaces here
+  namespaces: [default]
+  # namespaces:
+  #   - default
+  #   - namespace1
+  #   - namespace1
 
 vault:
   # Allows the mounting of various custom secrets to enable production vault
