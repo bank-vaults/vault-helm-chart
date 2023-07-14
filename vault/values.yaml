@@ -135,13 +135,10 @@ tls:
   # See templates/secret.yaml for the exact format.
   secretName: ""
 
-  # Allows using TLS to pull Vault secrets from other namespaces
-  # You can pass a list of namespaces here
-  namespaces: [default]
-  # namespaces:
-  #   - default
-  #   - namespace1
-  #   - namespace1
+  # Support for distributing the generated CA certificate Secret to other namespaces.
+  # Define a list of namespaces
+  caNamespaces:
+    - default
 
 vault:
   # Allows the mounting of various custom secrets to enable production vault
