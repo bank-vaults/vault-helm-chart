@@ -137,8 +137,8 @@ tls:
 
   # Support for distributing the generated CA certificate Secret to other namespaces.
   # Define a list of namespaces
-  caNamespaces:
-    - default
+  caNamespaces: []
+  #   - default
 
 vault:
   # Allows the mounting of various custom secrets to enable production vault
