@@ -9,7 +9,7 @@ replicaCount: 1
 strategy:
   type: RollingUpdate
 image:
-  repository: vault
+  repository: hashicorp/vault
   tag: 1.13.3
   pullPolicy: IfNotPresent
 
