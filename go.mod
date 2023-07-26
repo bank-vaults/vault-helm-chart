@@ -2,7 +2,7 @@ module github.com/bank-vaults/vault-helm-chart
 
 go 1.20
 
-require github.com/gruntwork-io/terratest v0.43.9
+require github.com/gruntwork-io/terratest v0.43.10
 
 require (
 	github.com/aws/aws-sdk-go v1.44.122 // indirect
