@@ -4,10 +4,6 @@ contact_links:
     url: https://github.com/bank-vaults/bank-vaults.dev/issues
     about: Suggest an improvement to the documentation
 
-  - name: ❓ Ask a question
-    url: https://github.com/bank-vaults/vault-helm-chart/discussions/new?category=q-a
-    about: Ask and discuss questions with other Bank-Vaults community members
-
   - name: 📚 Documentation
     url: https://bank-vaults.dev/docs/
     about: Check the documentation for help
