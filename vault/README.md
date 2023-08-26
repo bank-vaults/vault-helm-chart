@@ -19,7 +19,7 @@ provided under this option will be converted to JSON for the final vault
 
 Please also note that scaling to more than 1 replicas can be made successfully only with a configured HA Storage backend. By default this chart uses `file` backend, which is not HA.
 
-> See https://www.vaultproject.io/docs/configuration/ for more information.
+> See the [official docs](https://developer.hashicorp.com/vault/docs/configuration) for more information.
 
 ## Installing the Chart
 
@@ -92,7 +92,7 @@ helm install vault banzaicloud-stable/vault \
 
 ## Vault HA with MySQL backend
 
-You can set up a HA Vault to use MySQL for storing your encrypted secrets. MySQL supports the HA coordination of Vault, see the [official docs](https://www.vaultproject.io/docs/configuration/storage/mysql.html) for more details.
+You can set up a HA Vault to use MySQL for storing your encrypted secrets. MySQL supports the HA coordination of Vault, see the [official docs](https://developer.hashicorp.com/vault/docs/configuration/storage/mysql#high-availability-parameters) for more details.
 
 See the complete working Helm example below:
 
@@ -136,8 +136,8 @@ The following tables lists the configurable parameters of the vault chart and th
 | `unsealer.args`                      | Bank Vaults args                                                                                                | `["--mode", "k8s", "--k8s-secret-namespace", "default", "--k8s-secret-name", "bank-vaults"]`    |
 | `unsealer.image.tag`                 | Bank Vaults image tag                                                                                           | `.Chart.AppVersion`                                                                             |
 | `rbac.psp.enabled`                   | Use pod security policy                                                                                         | `false`                                                                                         |
-| `nodeSelector`                       | Node labels for pod assignment. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector | `{}`                                                                                            |
-| `tolerations`                        | List of node tolerations for the pods. https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/  | `[]`                                                                                            |
+| `nodeSelector`                       | Node labels for pod assignment. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector | `{}`                                                                                      |
+| `tolerations`                        | List of node tolerations for the pods. https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ | `[]`                                                                                       |
 | `affinity`                           | Node affinity settings for the pods. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/   | If not set it defaults to`podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution` |
 | `labels`                             | Additonal labels to be applied to the Vault StatefulSet and Pods                                                | `{}`                                                                                            |
 | `extraInitContainers`                | Init containers to add to the bank-vaults pod              | `[]`                                                                                            |
