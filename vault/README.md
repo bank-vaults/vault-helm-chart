@@ -168,7 +168,7 @@ Tested with
 
 First create a new project named "vault"
 ```bash
-oc new-app vault
+oc new-project vault
 ```
 Then create a new `scc` based on the `scc` restricted and add the capability "IPC_LOCK". Now add the new scc to the ServiceAccount vault of the new vault project:
 ```bash
