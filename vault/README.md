@@ -27,13 +27,13 @@ To install the chart, use the following:
 
 ```bash
 helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-helm install banzaicloud-stable/vault
+helm install vault banzaicloud-stable/vault
 ```
 
 To install the chart backed with a Consul cluster, use the following:
 
 ```bash
-helm install banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
+helm install vault banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
 ```
 
 An alternative `values.yaml` example using the Amazon S3 backend can be specified using:
@@ -56,7 +56,7 @@ An alternate example using Amazon custom secrets passed as environment variables
 kubectl create secret generic aws --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 # Tell the chart to pass these as env vars to Vault and as a file mount if needed
-helm install banzaicloud-stable/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
+helm install vault banzaicloud-stable/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
 ```
 
 ## Google Storage and KMS example
@@ -68,7 +68,7 @@ You can set up Vault to use Google KMS for sealing and Google Storage for storin
 kubectl create secret generic google --from-literal=GOOGLE_APPLICATION_CREDENTIALS=/etc/gcp/service-account.json --from-file=service-account.json=./service-account.json
 
 # Tell the chart to pass these vars to Vault and as a file mount if needed
-helm install banzaicloud-stable/vault \
+helm install vault banzaicloud-stable/vault \
 --set "vault.customSecrets[0].secretName=google" \
 --set "vault.customSecrets[0].mountPath=/etc/gcp" \
 --set "vault.config.storage.gcs.bucket=[google-bucket-name]" \
@@ -98,10 +98,10 @@ See the complete working Helm example below:
 
 ```bash
 # Install MySQL first with the official Helm chart, tell to create a user and a database called 'vault':
-helm install --name mysql stable/mysql --set mysqlUser=vault --set mysqlDatabase=vault
+helm install mysql stable/mysql --set mysqlUser=vault --set mysqlDatabase=vault
 
 # Install the Vault chart, tell it to use MySQL as the storage backend, also specify where the 'vault' user's password should be coming from (the MySQL chart generates a secret called 'mysql' holding the password):
-helm install --name vault banzaicloud-stable/vault \
+helm install vault banzaicloud-stable/vault \
 --set replicaCount=2 \
 --set vault.config.storage.mysql.address=mysql:3306 \
 --set vault.config.storage.mysql.username=vault \
