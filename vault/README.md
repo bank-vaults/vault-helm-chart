@@ -98,7 +98,7 @@ See the complete working Helm example below:
 
 ```bash
 # Install MySQL first with the official Helm chart, tell to create a user and a database called 'vault':
-helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql --set mysqlUser=vault --set mysqlDatabase=vault
+helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql --set auth.username=vault --set auth.database=vault
 
 # Install the Vault chart, tell it to use MySQL as the storage backend, also specify where the 'vault' user's password should be coming from (the MySQL chart generates a secret called 'mysql' holding the password):
 helm install vault banzaicloud-stable/vault \
