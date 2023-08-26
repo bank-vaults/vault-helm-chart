@@ -63,7 +63,7 @@ helm install vault banzaicloud-stable/vault --set "vault.customSecrets[0].secret
 
 You can set up Vault to use Google KMS for sealing and Google Storage for storing your encrypted secrets. See the usage example below:
 
-```
+```bash
 # Create a google secret with your Secret Account Key file in json fromat.
 kubectl create secret generic google --from-literal=GOOGLE_APPLICATION_CREDENTIALS=/etc/gcp/service-account.json --from-file=service-account.json=./service-account.json
 
@@ -176,7 +176,7 @@ oc adm policy add-scc-to-user <new_scc> system:serviceaccount:vault:vault
 ```
 
 Or you can define users in `scc` directly and in this case, you only have to create the `scc`.
-```
+```bash
 oc create -f <scc_file.yaml>
 ```
 
