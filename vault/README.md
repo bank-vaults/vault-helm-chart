@@ -36,6 +36,8 @@ To install the chart backed with a Consul cluster, use the following:
 helm install vault banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
 ```
 
+> Consul helm chart configuration is needed to [expose the service ports](https://developer.hashicorp.com/consul/docs/k8s/helm#v-server-exposeservice) and set up [Consul DNS request resolution](https://developer.hashicorp.com/consul/docs/k8s/dns).
+
 An alternative `values.yaml` example using the Amazon S3 backend can be specified using:
 
 ```yaml
