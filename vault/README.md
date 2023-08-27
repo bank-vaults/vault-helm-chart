@@ -19,7 +19,7 @@ provided under this option will be converted to JSON for the final vault
 
 Please also note that scaling to more than 1 replicas can be made successfully only with a configured HA Storage backend. By default this chart uses `file` backend, which is not HA.
 
-> See https://www.vaultproject.io/docs/configuration/ for more information.
+> See the [official docs](https://developer.hashicorp.com/vault/docs/configuration) for more information.
 
 ## Installing the Chart
 
@@ -27,14 +27,16 @@ To install the chart, use the following:
 
 ```bash
 helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-helm install banzaicloud-stable/vault
+helm install vault banzaicloud-stable/vault
 ```
 
 To install the chart backed with a Consul cluster, use the following:
 
 ```bash
-helm install banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
+helm install vault banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
 ```
+
+> Consul helm chart configuration is needed to [expose the service ports](https://developer.hashicorp.com/consul/docs/k8s/helm#v-server-exposeservice) and set up [Consul DNS request resolution](https://developer.hashicorp.com/consul/docs/k8s/dns).
 
 An alternative `values.yaml` example using the Amazon S3 backend can be specified using:
 
@@ -56,19 +58,19 @@ An alternate example using Amazon custom secrets passed as environment variables
 kubectl create secret generic aws --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 # Tell the chart to pass these as env vars to Vault and as a file mount if needed
-helm install banzaicloud-stable/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
+helm install vault banzaicloud-stable/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
 ```
 
 ## Google Storage and KMS example
 
 You can set up Vault to use Google KMS for sealing and Google Storage for storing your encrypted secrets. See the usage example below:
 
-```
+```bash
 # Create a google secret with your Secret Account Key file in json fromat.
 kubectl create secret generic google --from-literal=GOOGLE_APPLICATION_CREDENTIALS=/etc/gcp/service-account.json --from-file=service-account.json=./service-account.json
 
 # Tell the chart to pass these vars to Vault and as a file mount if needed
-helm install banzaicloud-stable/vault \
+helm install vault banzaicloud-stable/vault \
 --set "vault.customSecrets[0].secretName=google" \
 --set "vault.customSecrets[0].mountPath=/etc/gcp" \
 --set "vault.config.storage.gcs.bucket=[google-bucket-name]" \
@@ -92,16 +94,16 @@ helm install banzaicloud-stable/vault \
 
 ## Vault HA with MySQL backend
 
-You can set up a HA Vault to use MySQL for storing your encrypted secrets. MySQL supports the HA coordination of Vault, see the [official docs](https://www.vaultproject.io/docs/configuration/storage/mysql.html) for more details.
+You can set up a HA Vault to use MySQL for storing your encrypted secrets. MySQL supports the HA coordination of Vault, see the [official docs](https://developer.hashicorp.com/vault/docs/configuration/storage/mysql#high-availability-parameters) for more details.
 
 See the complete working Helm example below:
 
 ```bash
 # Install MySQL first with the official Helm chart, tell to create a user and a database called 'vault':
-helm install --name mysql stable/mysql --set mysqlUser=vault --set mysqlDatabase=vault
+helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql --set auth.username=vault --set auth.database=vault
 
 # Install the Vault chart, tell it to use MySQL as the storage backend, also specify where the 'vault' user's password should be coming from (the MySQL chart generates a secret called 'mysql' holding the password):
-helm install --name vault banzaicloud-stable/vault \
+helm install vault banzaicloud-stable/vault \
 --set replicaCount=2 \
 --set vault.config.storage.mysql.address=mysql:3306 \
 --set vault.config.storage.mysql.username=vault \
@@ -136,8 +138,8 @@ The following tables lists the configurable parameters of the vault chart and th
 | `unsealer.args`                      | Bank Vaults args                                                                                                | `["--mode", "k8s", "--k8s-secret-namespace", "default", "--k8s-secret-name", "bank-vaults"]`    |
 | `unsealer.image.tag`                 | Bank Vaults image tag                                                                                           | `.Chart.AppVersion`                                                                             |
 | `rbac.psp.enabled`                   | Use pod security policy                                                                                         | `false`                                                                                         |
-| `nodeSelector`                       | Node labels for pod assignment. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector | `{}`                                                                                            |
-| `tolerations`                        | List of node tolerations for the pods. https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/  | `[]`                                                                                            |
+| `nodeSelector`                       | Node labels for pod assignment. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector | `{}`                                                                                      |
+| `tolerations`                        | List of node tolerations for the pods. https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ | `[]`                                                                                       |
 | `affinity`                           | Node affinity settings for the pods. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/   | If not set it defaults to`podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution` |
 | `labels`                             | Additonal labels to be applied to the Vault StatefulSet and Pods                                                | `{}`                                                                                            |
 | `extraInitContainers`                | Init containers to add to the bank-vaults pod              | `[]`                                                                                            |
@@ -168,7 +170,7 @@ Tested with
 
 First create a new project named "vault"
 ```bash
-oc new-app vault
+oc new-project vault
 ```
 Then create a new `scc` based on the `scc` restricted and add the capability "IPC_LOCK". Now add the new scc to the ServiceAccount vault of the new vault project:
 ```bash
@@ -176,7 +178,7 @@ oc adm policy add-scc-to-user <new_scc> system:serviceaccount:vault:vault
 ```
 
 Or you can define users in `scc` directly and in this case, you only have to create the `scc`.
-```
+```bash
 oc create -f <scc_file.yaml>
 ```
 
