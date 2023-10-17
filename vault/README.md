@@ -30,14 +30,13 @@ Please also note that scaling to more than 1 replicas can be made successfully o
 To install the chart, use the following:
 
 ```bash
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-helm install vault banzaicloud-stable/vault
+helm install oci://ghcr.io/bank-vaults/helm-charts/vault
 ```
 
 To install the chart backed with a Consul cluster, use the following:
 
 ```bash
-helm install vault banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
+helm install oci://ghcr.io/bank-vaults/helm-charts/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
 ```
 
 > Consul helm chart configuration is needed to [expose the service ports](https://developer.hashicorp.com/consul/docs/k8s/helm#v-server-exposeservice) and set up [Consul DNS request resolution](https://developer.hashicorp.com/consul/docs/k8s/dns).
@@ -62,7 +61,7 @@ An alternate example using Amazon custom secrets passed as environment variables
 kubectl create secret generic aws --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 # Tell the chart to pass these as env vars to Vault and as a file mount if needed
-helm install vault banzaicloud-stable/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
+helm install oci://ghcr.io/bank-vaults/helm-charts/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
 ```
 
 ## Google Storage and KMS example
@@ -74,7 +73,7 @@ You can set up Vault to use Google KMS for sealing and Google Storage for storin
 kubectl create secret generic google --from-literal=GOOGLE_APPLICATION_CREDENTIALS=/etc/gcp/service-account.json --from-file=service-account.json=./service-account.json
 
 # Tell the chart to pass these vars to Vault and as a file mount if needed
-helm install vault banzaicloud-stable/vault \
+helm install oci://ghcr.io/bank-vaults/helm-charts/vault \
 --set "vault.customSecrets[0].secretName=google" \
 --set "vault.customSecrets[0].mountPath=/etc/gcp" \
 --set "vault.config.storage.gcs.bucket=[google-bucket-name]" \
@@ -107,7 +106,7 @@ See the complete working Helm example below:
 helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql --set auth.username=vault --set auth.database=vault
 
 # Install the Vault chart, tell it to use MySQL as the storage backend, also specify where the 'vault' user's password should be coming from (the MySQL chart generates a secret called 'mysql' holding the password):
-helm install vault banzaicloud-stable/vault \
+helm install oci://ghcr.io/bank-vaults/helm-charts/vault \
 --set replicaCount=2 \
 --set vault.config.storage.mysql.address=mysql:3306 \
 --set vault.config.storage.mysql.username=vault \
@@ -259,7 +258,7 @@ You will get the message, that the user system:serviceaccount:vault:vault doesn'
 In the next step you install the helm chart vault in the namespace "vault" with the following command:
 
 ```bash
-helm install vault banzaicloud-stable/vault --set "unsealer.args[0]=--mode" --set "unsealer.args[1]=k8s" --set "unsealer.args[2]=--k8s-secret-namespace" --set "unsealer.args[3]=vault" --set "unsealer.args[4]=--k8s-secret-name" --set "unsealer.args[5]=bank-vaults"
+helm install oci://ghcr.io/bank-vaults/helm-charts/vault --set "unsealer.args[0]=--mode" --set "unsealer.args[1]=k8s" --set "unsealer.args[2]=--k8s-secret-namespace" --set "unsealer.args[3]=vault" --set "unsealer.args[4]=--k8s-secret-name" --set "unsealer.args[5]=bank-vaults"
 ```
 
 Changing the values of the arguments of the unsealer is necessary because in the values.yaml the default namespace is used to store the secret. Creating the secret in the same namespace like vault is the easiest solution. In alternative you can create a role which allows creating and read secrets in the default namespace.
