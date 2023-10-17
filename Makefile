@@ -58,7 +58,7 @@ generate: ## Run generation jobs
 
 .PHONY: generate-helm-docs
 generate-helm-docs:
-	helm-docs -s file -c . -t README.md.gotmpl
+	helm-docs -s file -c ./vault -t README.md.gotmpl
 
 deps: bin/kind bin/helm-docs
 deps: ## Install dependencies

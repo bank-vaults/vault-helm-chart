@@ -1,222 +1,199 @@
 # Default values for vault.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
 global:
-  # If deploying to OpenShift
+  # -- Specify if the chart is being deployed to OpenShift
   openshift: false
 
+# -- Number of replicas
 replicaCount: 1
+
 strategy:
+  # -- Update strategy to use for Vault StatefulSet
   type: RollingUpdate
+
 image:
+  # -- Container image repo that contains HashiCorp Vault
   repository: hashicorp/vault
+  # -- Container image tag
   tag: 1.14.1
+  # -- Container image pull policy
   pullPolicy: IfNotPresent
 
 service:
+  # -- Vault service name
   name: vault
+  # -- Vault service type
   type: ClusterIP
+  # -- Vault service external port
   port: 8200
-  ## Force load balancer IP
-  # loadBalancerIP: 1.2.3.4
-  # annotations:
-  #   cloud.google.com/load-balancer-type: "Internal"
+  # -- Force Vault load balancer IP
+  loadBalancerIP: null
+  # -- Vault service annotations.
+  # For example, use `cloud.google.com/load-balancer-type: "Internal"` to specify GCP load balancer type.
+  annotations: {}
 
 headlessService:
+  # -- Enable headless service for Vault
   enabled: false
+  # -- Vault headless service name
   name: vault
+  # -- Vault headless service external port
   port: 8200
-  # annotations:
-  #   external-dns.alpha.kubernetes.io/hostname: vault.mydomain.com
+  # -- Vault headless service annotations.
+  # For example, use `external-dns.alpha.kubernetes.io/hostname: vault.mydomain.com` to create record-set.
+  annotations: {}
 
 ingress:
+  # -- Enable Vault ingress
   enabled: false
 
-  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-  # ingressClassName: nginx
+  # -- Vault ingress class name.
+  # For Kubernetes >= 1.18, you should specify the ingress-controller via this field.
+  # Check: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  ingressClassName: ""
 
-  # Used to create Ingress record (should used with service.type: ClusterIP).
-  # hosts:
-  #  - chart-example.local/vault
-  # annotations:
-  #   kubernetes.io/ingress.class: nginx
-  #   kubernetes.io/tls-acme: "true"
-  # tls:
-  #   Secrets must be manually created in the namespace.
-  #   - secretName: chart-example-tls
-  #     hosts:
-  #       - chart-example.local
+  # -- Vault ingress annotations
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+
+  # -- Vault ingress accepted hostnames with path.
+  # Used to create Ingress record and should be used with `service.type: ClusterIP`.
+  hosts: []
+    # - chart-example.local/vault
+
+  # -- Vault ingress TLS configuration.
+  # TLS secrets must be manually created in the namespace.
+  tls: []
+    # - secretName: chart-example-tls
+    #   hosts:
+    #     - chart-example.local
+
 persistence:
-  ## Enable persistence using Persistent Volume Claims
-  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  # -- Enable persistence using Persistent Volume Claims.
+  # Check: http://kubernetes.io/docs/user-guide/persistent-volumes/
   enabled: false
-  ## Vault data Persistent Volume Storage Class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ## set, choosing the default provisioner. (gp2 on AWS, standard on
-  ## GKE, AWS & OpenStack)
-  # storageClass: "-"
-  # Used for hostPath persistence if left empty, "emptyDir" will be used
+
+  # -- Set Vault data Persistent Volume Storage Class.
+  # If defined, sets the actual `storageClassName: <storageClass>`.
+  # If set to "-", sets the actual `storageClassName: ""`, which disables dynamic provisioning.
+  # If undefined (the default) or set to null, no `storageClassName` spec is
+  # set, choosing the default provisioner.  (gp2 on AWS, standard on
+  # GKE, AWS & OpenStack).
+  storageClass: null
+
+  # -- Used for hostPath persistence if PVC is disabled.
+  # If both PVC and hostPath persistence are disabled, "emptyDir" will be used.
+  # Check: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
   hostPath: ""
-  ## Set default PVC size
+
+  # -- Set default PVC size
   size: 10G
-  ## Set default PVC access mode: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
+
+  # -- Set default PVC access mode.
+  # Check: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
   accessMode: ReadWriteOnce
-podAnnotations:
-  prometheus.io/scrape: "true"
-  prometheus.io/path: "/metrics"
-  prometheus.io/port: "9102"
 
-labels: {}
-  #  team: banzai
-
-resources:
-  requests:
-    cpu: 100m
-    memory: 512Mi
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-## Node labels for pod assignment
-nodeSelector: {}
-
-## Add tolerations if specified
-tolerations: []
-# - effect: NoSchedule
-#   key: "key"
-#   operator: Equal
-#   value: "value"
-
-## Add affinity (defaults sets podAntiAffinity to preferredDuringSchedulingIgnoredDuringExecution)
-affinity: {}
-
-## This is meant to allow adding init containers
+# -- Containers to run before the Vault containers are started (init containers)
 extraInitContainers: []
-# - name: waiter
-#   image: busybox
-#   args:
-#   - sleep
-#   - 10
+  # - name: waiter
+  #   image: busybox
+  #   args:
+  #   - sleep
+  #   - 10
 
-## This is meant to allow adding sidecar containers
+# -- Containers to run alongside Vault containers (sidecar containers)
 extraContainers: []
-# - name: consul-agent
-#   image: consul:1.10.4
-#   args:
-#   - -log-level=debug
-#   - -advertise="${POD_IP}"
-#   - -bind=0.0.0.0
-#   - -grpc-port=8502
-#   - -datacenter=dc1
-#   - -data-dir=/consul/data
-#   - -config-dir=/consul/config
+  # - name: consul-agent
+  #   image: consul:1.10.4
+  #   args:
+  #   - -log-level=debug
+  #   - -advertise="${POD_IP}"
+  #   - -bind=0.0.0.0
+  #   - -grpc-port=8502
+  #   - -datacenter=dc1
+  #   - -data-dir=/consul/data
+  #   - -config-dir=/consul/config
 
-## This is meant to allow adding volumes for sidecar and init containers
+# -- Extra volume definitions for sidecar and init containers
 extraContainerVolumes: []
-# - name: volume-from-secret
-#   secret:
-#     secretName: secret-to-mount
-# - name: empty-dir-volume
-#   emptyDir: {}
+  # - name: volume-from-secret
+  #   secret:
+  #     secretName: secret-to-mount
+  # - name: empty-dir-volume
+  #   emptyDir: {}
 
 tls:
-  # Specify a secret which holds your custom TLS certificate.
-  # If not specified Helm will generate one for you.
-  # See templates/secret.yaml for the exact format.
+  # -- Specify a secret which holds your custom TLS certificate.
+  # If not specified, Helm will generate one for you.
   secretName: ""
 
-  # Support for distributing the generated CA certificate Secret to other namespaces.
-  # Define a list of namespaces
+  # -- Distribute the generated CA certificate Secret to other namespaces
   caNamespaces: []
-  #   - default
+    # - default
 
 vault:
-  # Allows the mounting of various custom secrets to enable production vault
-  # configurations. The comments show an example usage for mounting a TLS
-  # secret. The two fields required are a secretName indicating the name of
-  # the Kuberentes secret (created outside of this chart), and the mountPath
+  # -- Custom secrets available to Vault.
+  # Allows the mounting of various custom secrets to enable production Vault
+  # configurations. The two fields required are `secretName` indicating the name
+  # of the Kubernetes secret (created outside of this chart), and `mountPath`
   # at which it should be mounted in the Vault container.
   customSecrets: []
     # - secretName: vault-tls
     #   mountPath: /vault/tls
+
+  # -- Custom secrets available to Vault as env vars.
   # Allows creating various custom environment variables from secrets to enable
-  # production vault configurations. The comments show an example usage for
-  # passing a MySQL secret. The three fields required are a secretName indicating
-  # the name of the Kuberentes secret (created outside of this chart), secretKey
-  # in this secret and envName which will be the name of the env var in the containers.
+  # production Vault configurations. The three fields required are `secretName` indicating
+  # the name of the Kubernetes secret (created outside of this chart), `secretKey`
+  # in this secret and `envName` which will be the name of the env var in the containers.
   envSecrets: []
     # - secretName: mysql
     #   secretKey: mysql-username
     #   envName: "MYSQL_USERNAME"
-  # Allows adding various custom eenvironment variables directly.
+
+  # -- Custom env vars available to Vault.
   envs: []
     # - name: GOOGLE_APPLICATION_CREDENTIALS
     #   value: /etc/gcp/service-account.json
-  externalConfig:
-    # Allows creating policies in Vault which can be used later on in roles
-    # for the Kubernetes based authentication.
-    # See https://www.vaultproject.io/docs/concepts/policies.html for more information.
-    policies:
-      - name: allow_secrets
-        rules: path "secret/*" {
-          capabilities = ["create", "read", "update", "delete", "list"]
-          }
-    auth:
-      - type: kubernetes
-        # Allows creating roles in Vault which can be used later on for the Kubernetes based
-        # authentication.
-        # See https://www.vaultproject.io/docs/auth/kubernetes.html#creating-a-role for
-        # more information.
-        roles:
-          # Allow every pod in the default namespace to use the secret kv store
-          - name: default
-            bound_service_account_names: default
-            bound_service_account_namespaces: default
-            policies: allow_secrets
-            ttl: 1h
-    secrets:
-      - path: secret
-        type: kv
-        description: General secrets.
-        options:
-          version: 2
+
+  # -- A YAML representation of the final Vault config file.
+  # Check: https://developer.hashicorp.com/vault/docs/configuration
   config:
-    # A YAML representation of a final vault config.json file.
-    # See https://www.vaultproject.io/docs/configuration/ for more information.
+    # @ignored
     listener:
       tcp:
         address: "[::]:8200"
+
         # tls_disable: true
-        tls_cert_file: /vault/tls/server.crt
-        tls_key_file: /vault/tls/server.key
-        # If certManager.certificate is enabled use these parameters intead
+
+        ## If certManager.certificate is enabled use these parameters instead
         # tls_client_ca_file: /vault/tls/ca.crt
         # tls_cert_file: /vault/tls/tls.crt
         # tls_key_file: /vault/tls/tls.key
 
+        ## Otherwise, use
+        tls_cert_file: /vault/tls/server.crt
+        tls_key_file: /vault/tls/server.key
+
+    # @ignored
     telemetry:
       statsd_address: localhost:9125
 
+    # @ignored
     ui: true
 
-    # Uncomment this to remove the need for the IPC_LOCK capability
-    # disable_mlock: true
+    # @ignored
+    disable_mlock: false
 
-    # See https://www.vaultproject.io/docs/configuration/storage/ for storage backends
-    storage:
-      {}
+    # Check https://www.vaultproject.io/docs/configuration/storage/ for supported storage backends.
+    # @ignored
+    storage: {}
       # file:
       #   path: "/vault/file"
+      #
       # consul:
       #   address: ""
       #   path: ""
@@ -236,22 +213,69 @@ vault:
       #   bucket: ""
       #   credentials_file: ""
       #   ha_enabled: "true"
+      #
+
+    ## @ignored
     # api_addr: http://localhost:8200
+
+  # -- A YAML representation of dynamic config data used by Bank-Vaults.
+  # Bank-Vaults will use this data to continuously configure Vault.
+  # Check: https://bank-vaults.dev/docs/external-configuration/
+  externalConfig:
+    # Allows creating policies in Vault which can be used later on in roles
+    # for the Kubernetes based authentication.
+    # See https://www.vaultproject.io/docs/concepts/policies.html for more information.
+    # @ignored
+    policies:
+      - name: allow_secrets
+        rules: |
+          path "secret/*" {
+            capabilities = ["create", "read", "update", "delete", "list"]
+          }
+
+    # @ignored
+    auth:
+      - type: kubernetes
+        # Allows creating roles in Vault which can be used later on for the Kubernetes based
+        # authentication.
+        # See https://www.vaultproject.io/docs/auth/kubernetes.html#creating-a-role.
+        roles:
+          # Allow every pod in the default namespace to use the secret kv store
+          - name: default
+            bound_service_account_names: default
+            bound_service_account_namespaces: default
+            policies: allow_secrets
+            ttl: 1h
+
+    # @ignored
+    secrets:
+      - path: secret
+        type: kv
+        description: General secrets.
+        options:
+          version: 2
 
   # Until this issue is fixed: https://github.com/kubernetes/helm/issues/3117
   # we have to workaround the default storage problem.
+  # @ignored
   defaultStorage:
     storage:
       file:
         path: "/vault/file"
 
+  # @ignored
   logLevel: info
 
 unsealer:
   image:
+    # -- Container image repo that contains Bank-Vaults
     repository: ghcr.io/bank-vaults/bank-vaults
+    # -- Container image tag
     tag: "1.20.0"
+    # -- Container image pull policy
     pullPolicy: IfNotPresent
+
+  # @ignored
   args:
     [
       "--mode",
@@ -261,6 +285,8 @@ unsealer:
       "--k8s-secret-name",
       "bank-vaults",
     ]
+
+  # @ignored
   metrics:
     enabled: true
     debug: true
@@ -277,15 +303,14 @@ unsealer:
 
 statsd:
   image:
+    # -- Container image repo that contains StatsD Prometheus exporter
     repository: prom/statsd-exporter
+    # -- Container image tag
     tag: latest
+    # -- Container image pull policy
     pullPolicy: IfNotPresent
-  metrics:
-    enabled: true
-    port: 9102
-    serviceMonitor:
-      enabled: false
-      additionalLabels: {}
+
+  # @ignored
   config:
     mappings:
       - match: vault.route.*.*
@@ -294,47 +319,65 @@ statsd:
           method: "$1"
           path: "$2"
 
+  # @ignored
+  metrics:
+    enabled: true
+    port: 9102
+    serviceMonitor:
+      enabled: false
+      additionalLabels: {}
+
 rbac:
   psp:
+    # -- Use pod security policy
     enabled: false
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Specifies whether the system:auth-delegator ClusterRoleBinding will be bound to the created/attached serviceAccount
-  createClusterRoleBinding: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- The name of the service account to use.
+  # If not set and `create` is true, a name is generated using the fullname template.
   name: ""
+  # -- Annotations to add to the service account.
+  # For example, use `iam.gke.io/gcp-service-account: gsa@project.iam.gserviceaccount.com` to enable GKE workload identity.
+  annotations: {}
+  # -- Bind `system:auth-delegator` ClusterRoleBinding to this service account
+  createClusterRoleBinding: true
 
+# @ignored
 vaultConfig:
   resources: {}
 
+# @ignored
 vaultUnsealer:
   resources:
     requests:
       cpu: 50m
       memory: 64Mi
 
+# @ignored
 vaultConfigurer:
   resources:
     requests:
       cpu: 50m
       memory: 64Mi
 
+# @ignored
 prometheusStatsdExporter:
   resources:
     requests:
       cpu: 50m
       memory: 128Mi
 
-# Please see necessary changes to vault.config.listener.tcp above if enabled
-# Either issuerRef must be set to your Issuer or issuer must be enabled to generate a SelfSigned one
+# -- Configure CertManager issuer and certificate.
+# If enabled, please see necessary changes to `vault.config.listener.tcp` above.
+# Either `issuerRef` must be set to your Issuer or issuer must be enabled to generate a SelfSigned one.
 certManager:
+  # @ignored
   issuer:
     enabled: false
+
+  # @ignored
   certificate:
     enabled: false
     # issuerRef:
@@ -342,12 +385,65 @@ certManager:
     #   - vault.mydomain.com
 
 podDisruptionBudget:
+  # -- Enables PodDisruptionBudget
   enabled: true
+  # -- Represents the number of Pods that must be available (integer or percentage)
   # minAvailable: 1
+  # -- Represents the number of Pods that can be unavailable (integer or percentage)
   maxUnavailable: 1
 
-## Assign a PriorityClassName to pods if set
+# -- Extra annotations to add to pod metadata
+podAnnotations:
+  # @ignored
+  prometheus.io/scrape: "true"
+  # @ignored
+  prometheus.io/path: "/metrics"
+  # @ignored
+  prometheus.io/port: "9102"
+
+# -- Additional labels to be applied to the Vault StatefulSet and Pods
+labels: {}
+  # team: banzai
+
+# -- Resources to request for Vault
+resources:
+  # @ignored
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube.
+  ## If you do want to specify resources, uncomment the following
+  ## lines and adjust them as necessary.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- Node labels for pod assignment.
+# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+nodeSelector: {}
+
+# -- List of node tolerations for the pods.
+# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+tolerations: []
+  # - effect: NoSchedule
+  #   key: "key"
+  #   operator: Equal
+  #   value: "value"
+
+# Node affinity settings for the pods.
+# If not set, it defaults `podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution`
+# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+affinity: {}
+
+# -- Assign a PriorityClassName to pods if set.
+# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
 priorityClassName: ""
 
-# Override cluster version
+# -- Override cluster version
 kubeVersion: ""
