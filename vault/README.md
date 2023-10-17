@@ -1,4 +1,8 @@
-# Vault Helm Chart
+# vault
+
+A tool for secrets management, encryption as a service, and privileged access management
+
+**Homepage:** <https://www.vaultproject.io/>
 
 This directory contains a Kubernetes Helm chart to deploy a Vault server. For further details of how are we using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
 
@@ -26,14 +30,13 @@ Please also note that scaling to more than 1 replicas can be made successfully o
 To install the chart, use the following:
 
 ```bash
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-helm install vault banzaicloud-stable/vault
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault
 ```
 
 To install the chart backed with a Consul cluster, use the following:
 
 ```bash
-helm install vault banzaicloud-stable/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
 ```
 
 > Consul helm chart configuration is needed to [expose the service ports](https://developer.hashicorp.com/consul/docs/k8s/helm#v-server-exposeservice) and set up [Consul DNS request resolution](https://developer.hashicorp.com/consul/docs/k8s/dns).
@@ -58,8 +61,10 @@ An alternate example using Amazon custom secrets passed as environment variables
 kubectl create secret generic aws --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 # Tell the chart to pass these as env vars to Vault and as a file mount if needed
-helm install vault banzaicloud-stable/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
 ```
+
+Note that currently we only support OCI charts. If you wish to use
 
 ## Google Storage and KMS example
 
@@ -70,7 +75,7 @@ You can set up Vault to use Google KMS for sealing and Google Storage for storin
 kubectl create secret generic google --from-literal=GOOGLE_APPLICATION_CREDENTIALS=/etc/gcp/service-account.json --from-file=service-account.json=./service-account.json
 
 # Tell the chart to pass these vars to Vault and as a file mount if needed
-helm install vault banzaicloud-stable/vault \
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
 --set "vault.customSecrets[0].secretName=google" \
 --set "vault.customSecrets[0].mountPath=/etc/gcp" \
 --set "vault.config.storage.gcs.bucket=[google-bucket-name]" \
@@ -103,7 +108,7 @@ See the complete working Helm example below:
 helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql --set auth.username=vault --set auth.database=vault
 
 # Install the Vault chart, tell it to use MySQL as the storage backend, also specify where the 'vault' user's password should be coming from (the MySQL chart generates a secret called 'mysql' holding the password):
-helm install vault banzaicloud-stable/vault \
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
 --set replicaCount=2 \
 --set vault.config.storage.mysql.address=mysql:3306 \
 --set vault.config.storage.mysql.username=vault \
@@ -113,43 +118,69 @@ helm install vault banzaicloud-stable/vault \
 --set "vault.envSecrets[0].envName=MYSQL_PASSWORD"
 ```
 
-## Configuration
+## Values
 
-The following tables lists the configurable parameters of the vault chart and their default values.
+The following table lists the configurable parameters of the Helm chart.
 
-| Parameter                            | Description                                                                                                     | Default                                                                                         |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `image.pullPolicy`                   | Container pull policy                                                                                           | `IfNotPresent`                                                                                  |
-| `image.repository`                   | Container image to use                                                                                          | `vault`                                                                                         |
-| `image.tag`                          | Container image tag to deploy                                                                                   | `1.6.2`                                                                                         |
-| `ingress.enabled`                    | Enables Ingress                                                                                                 | `false`                                                                                         |
-| `ingress.ingressClassName`           | Ingress class name                                                                                              | `""`                                                                                            | 
-| `ingress.annotations`                | Ingress annotations                                                                                             | `{}`                                                                                            |
-| `ingress.hosts`                      | Ingress accepted hostnames with path                                                                            | `[]`                                                                                            |
-| `ingress.tls`                        | Ingress TLS configuration                                                                                       | `[]`                                                                                            |
-| `vault.envs`                         | Custom environment variables available to Vault                                                                 | `[]`                                                                                            |
-| `vault.customSecrets`                | Custom secrets available to Vault                                                                               | `[]`                                                                                            |
-| `vault.envSecrets`                   | Custom secrets available to Vault as env vars                                                                   | `[]`                                                                                            |
-| `vault.config`                       | Vault configuration                                                                                             | No default backend                                                                              |
-| `vault.externalConfig`               | Vault API based configuration                                                                                   | No default backend                                                                              |
-| `replicaCount`                       | k8s replicas                                                                                                    | `1`                                                                                             |
-| `resources.limits.cpu`               | Container requested CPU                                                                                         | `nil`                                                                                           |
-| `resources.limits.memory`            | Container requested memory                                                                                      | `nil`                                                                                           |
-| `unsealer.args`                      | Bank Vaults args                                                                                                | `["--mode", "k8s", "--k8s-secret-namespace", "default", "--k8s-secret-name", "bank-vaults"]`    |
-| `unsealer.image.tag`                 | Bank Vaults image tag                                                                                           | `.Chart.AppVersion`                                                                             |
-| `rbac.psp.enabled`                   | Use pod security policy                                                                                         | `false`                                                                                         |
-| `nodeSelector`                       | Node labels for pod assignment. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector | `{}`                                                                                      |
-| `tolerations`                        | List of node tolerations for the pods. https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ | `[]`                                                                                       |
-| `affinity`                           | Node affinity settings for the pods. https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/   | If not set it defaults to`podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution` |
-| `labels`                             | Additonal labels to be applied to the Vault StatefulSet and Pods                                                | `{}`                                                                                            |
-| `extraInitContainers`                | Init containers to add to the bank-vaults pod              | `[]`                                                                                            |
-| `extraContainers`                    | Sidecar containers to add to the bank-vaults pod            | `[]`                                                                                            |
-| `extraContainerVolumes`              | Volumes that can be mounted in sidecar containers         | `[]`                                                                                            |
-| `tls.secretName`                     | Custom TLS certifcate secret name                                                                               | `""`                                                                                            |
-| `podDisruptionBudget.enabled`        | enable PodDisruptionBudget                                                                                      | `true`                                                                                          |
-| `podDisruptionBudget.minAvailable`   | represents the number of Pods that must be available (integer or percentage)                                    | `nil`                                                                                           |
-| `podDisruptionBudget.maxUnavailable` | represents the number of Pods that can be unavailable (integer or percentage)                                   | `1`                                                                                             |
-| `priorityClassName`                  | The PriorityClass to assign to Pods                                                                             | `""`                                                                                            |
+| Parameter | Type | Default | Description |
+| --- | ---- | ------- | ----------- |
+| `global.openshift` | bool | `false` | Specify if the chart is being deployed to OpenShift |
+| `replicaCount` | int | `1` | Number of replicas |
+| `strategy.type` | string | `"RollingUpdate"` | Update strategy to use for Vault StatefulSet |
+| `image.repository` | string | `"hashicorp/vault"` | Container image repo that contains HashiCorp Vault |
+| `image.tag` | string | `"1.14.1"` | Container image tag |
+| `image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
+| `service.name` | string | `"vault"` | Vault service name |
+| `service.type` | string | `"ClusterIP"` | Vault service type |
+| `service.port` | int | `8200` | Vault service external port |
+| `service.loadBalancerIP` | string | `nil` | Force Vault load balancer IP |
+| `service.annotations` | object | `{}` | Vault service annotations. For example, use `cloud.google.com/load-balancer-type: "Internal"` to specify GCP load balancer type. |
+| `headlessService.enabled` | bool | `false` | Enable headless service for Vault |
+| `headlessService.name` | string | `"vault"` | Vault headless service name |
+| `headlessService.port` | int | `8200` | Vault headless service external port |
+| `headlessService.annotations` | object | `{}` | Vault headless service annotations. For example, use `external-dns.alpha.kubernetes.io/hostname: vault.mydomain.com` to create record-set. |
+| `ingress.enabled` | bool | `false` | Enable Vault ingress |
+| `ingress.ingressClassName` | string | `""` | Vault ingress class name. For Kubernetes >= 1.18, you should specify the ingress-controller via this field. Check: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress |
+| `ingress.annotations` | object | `{}` | Vault ingress annotations |
+| `ingress.hosts` | list | `[]` | Vault ingress accepted hostnames with path. Used to create Ingress record and should be used with `service.type: ClusterIP`. |
+| `ingress.tls` | list | `[]` | Vault ingress TLS configuration. TLS secrets must be manually created in the namespace. |
+| `persistence.enabled` | bool | `false` | Enable persistence using Persistent Volume Claims. Check: http://kubernetes.io/docs/user-guide/persistent-volumes/ |
+| `persistence.storageClass` | string | `nil` | Set Vault data Persistent Volume Storage Class. If defined, sets the actual `storageClassName: <storageClass>`. If set to "-", sets the actual `storageClassName: ""`, which disables dynamic provisioning. If undefined (the default) or set to null, no `storageClassName` spec is set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack). |
+| `persistence.hostPath` | string | `""` | Used for hostPath persistence if PVC is disabled. If both PVC and hostPath persistence are disabled, "emptyDir" will be used. Check: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath |
+| `persistence.size` | string | `"10G"` | Set default PVC size |
+| `persistence.accessMode` | string | `"ReadWriteOnce"` | Set default PVC access mode. Check: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes |
+| `extraInitContainers` | list | `[]` | Containers to run before the Vault containers are started (init containers) |
+| `extraContainers` | list | `[]` | Containers to run alongside Vault containers (sidecar containers) |
+| `extraContainerVolumes` | list | `[]` | Extra volume definitions for sidecar and init containers |
+| `tls.secretName` | string | `""` | Specify a secret which holds your custom TLS certificate. If not specified, Helm will generate one for you. |
+| `tls.caNamespaces` | list | `[]` | Distribute the generated CA certificate Secret to other namespaces |
+| `vault.customSecrets` | list | `[]` | Custom secrets available to Vault. Allows the mounting of various custom secrets to enable production Vault configurations. The two fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), and `mountPath` at which it should be mounted in the Vault container. |
+| `vault.envSecrets` | list | `[]` | Custom secrets available to Vault as env vars. Allows creating various custom environment variables from secrets to enable production Vault configurations. The three fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), `secretKey` in this secret and `envName` which will be the name of the env var in the containers. |
+| `vault.envs` | list | `[]` | Custom env vars available to Vault. |
+| `vault.config` | object | `{}` | A YAML representation of the final Vault config file. Check: https://developer.hashicorp.com/vault/docs/configuration |
+| `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: https://bank-vaults.dev/docs/external-configuration/ |
+| `unsealer.image.repository` | string | `"ghcr.io/bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
+| `unsealer.image.tag` | string | `"1.20.4"` | Container image tag |
+| `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
+| `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
+| `statsd.image.tag` | string | `"latest"` | Container image tag |
+| `statsd.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
+| `rbac.psp.enabled` | bool | `false` | Use pod security policy |
+| `serviceAccount.create` | bool | `true` | Specifies whether a service account should be created |
+| `serviceAccount.name` | string | `""` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. |
+| `serviceAccount.annotations` | object | `{}` | Annotations to add to the service account. For example, use `iam.gke.io/gcp-service-account: gsa@project.iam.gserviceaccount.com` to enable GKE workload identity. |
+| `serviceAccount.createClusterRoleBinding` | bool | `true` | Bind `system:auth-delegator` ClusterRoleBinding to this service account |
+| `certManager` | object | `{}` | Configure CertManager issuer and certificate. If enabled, please see necessary changes to `vault.config.listener.tcp` above. Either `issuerRef` must be set to your Issuer or issuer must be enabled to generate a SelfSigned one. |
+| `podDisruptionBudget.enabled` | bool | `true` | Enables PodDisruptionBudget |
+| `podDisruptionBudget.maxUnavailable` | int | `1` | Represents the number of Pods that can be unavailable (integer or percentage) |
+| `podAnnotations` | object | `{}` | Extra annotations to add to pod metadata |
+| `labels` | object | `{}` | Additional labels to be applied to the Vault StatefulSet and Pods |
+| `resources` | object | `{}` | Resources to request for Vault |
+| `nodeSelector` | object | `{}` | Node labels for pod assignment. Check: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
+| `tolerations` | list | `[]` | List of node tolerations for the pods. Check: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ |
+| `affinity` | object | `{}` |  |
+| `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/ |
+| `kubeVersion` | string | `""` | Override cluster version |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
@@ -229,7 +260,7 @@ You will get the message, that the user system:serviceaccount:vault:vault doesn'
 In the next step you install the helm chart vault in the namespace "vault" with the following command:
 
 ```bash
-helm install vault banzaicloud-stable/vault --set "unsealer.args[0]=--mode" --set "unsealer.args[1]=k8s" --set "unsealer.args[2]=--k8s-secret-namespace" --set "unsealer.args[3]=vault" --set "unsealer.args[4]=--k8s-secret-name" --set "unsealer.args[5]=bank-vaults"
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault --set "unsealer.args[0]=--mode" --set "unsealer.args[1]=k8s" --set "unsealer.args[2]=--k8s-secret-namespace" --set "unsealer.args[3]=vault" --set "unsealer.args[4]=--k8s-secret-name" --set "unsealer.args[5]=bank-vaults"
 ```
 
 Changing the values of the arguments of the unsealer is necessary because in the values.yaml the default namespace is used to store the secret. Creating the secret in the same namespace like vault is the easiest solution. In alternative you can create a role which allows creating and read secrets in the default namespace.
