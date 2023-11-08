@@ -31,7 +31,7 @@ artifacts: ## Build artifacts
 .PHONY: helm-chart
 helm-chart: ## Build Helm chart
 	@mkdir -p build
-	helm package -d build/ vault
+	$(HELM_BIN) package -d build/ vault
 
 .PHONY: generate
 generate: ## Generate Helm chart documentation
@@ -52,7 +52,7 @@ lint: ## Run lint checks
 
 .PHONY: lint-helm
 lint-helm:
-	helm lint vault
+	$(HELM_BIN) lint vault
 
 .PHONY: lint-yaml
 lint-yaml:
@@ -60,7 +60,7 @@ lint-yaml:
 
 ##@ Dependencies
 
-deps: bin/kind bin/helm-docs
+deps: bin/kind bin/helm-docs bin/helm
 deps: ## Install dependencies
 
 # Dependency versions
@@ -69,11 +69,13 @@ HELM_DOCS_VERSION = 1.11.0
 
 # Dependency binaries
 KIND_BIN := kind
+HELM_BIN := helm
 HELM_DOCS_BIN := helm-docs
 
 # If we have "bin" dir, use those binaries instead
 ifneq ($(wildcard ./bin/.),)
 	KIND_BIN := bin/$(KIND_BIN)
+	HELM_BIN := bin/$(HELM_BIN)
 	HELM_DOCS_BIN := bin/$(HELM_DOCS_BIN)
 endif
 
@@ -81,6 +83,10 @@ bin/kind:
 	@mkdir -p bin
 	curl -Lo bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-$(shell uname -s | tr '[:upper:]' '[:lower:]')-$(shell uname -m | sed -e "s/aarch64/arm64/; s/x86_64/amd64/")
 	@chmod +x bin/kind
+
+bin/helm:
+	@mkdir -p bin
+	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | USE_SUDO=false HELM_INSTALL_DIR=bin bash
 
 bin/helm-docs:
 	@mkdir -p bin
