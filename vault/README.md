@@ -5,11 +5,11 @@ A tool for secrets management, encryption as a service, and privileged access ma
 This directory contains a Kubernetes Helm chart to deploy a [Vault](https://www.vaultproject.io/) server.
 For further details on how we are using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
 
-**Requirements**
+### Requirements
 
 * Kubernetes 1.6+
 
-**Notes**
+### Notes
 
 Please note that a backend service for Vault (for example, Consul) must be deployed beforehand and configured with the `vault.config` option.<br>
 YAML provided under this option will be converted to JSON for the final Vault `config.json` file.
