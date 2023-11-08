@@ -2,30 +2,24 @@
 
 A tool for secrets management, encryption as a service, and privileged access management
 
-**Homepage:** <https://www.vaultproject.io/>
+This directory contains a Kubernetes Helm chart to deploy a [Vault](https://www.vaultproject.io/) server.
+For further details on how we are using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
 
-This directory contains a Kubernetes Helm chart to deploy a Vault server. For further details of how are we using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
-
-## Prerequisites Details
+### Requirements
 
 * Kubernetes 1.6+
 
-## Chart Details
+### Notes
 
-This chart will do the following:
+Please note that a backend service for Vault (for example, Consul) must be deployed beforehand and configured with the `vault.config` option.<br>
+YAML provided under this option will be converted to JSON for the final Vault `config.json` file.
 
-* Implement a Vault deployment
-
-Please note that a backend service for Vault (for example, Consul) must
-be deployed beforehand and configured with the `vault.config` option. YAML
-provided under this option will be converted to JSON for the final vault
-`config.json` file.
-
-Please also note that scaling to more than 1 replicas can be made successfully only with a configured HA Storage backend. By default this chart uses `file` backend, which is not HA.
+Please also note that scaling to more than 1 replicas can be made successfully only with a configured HA Storage backend.
+By default this chart uses `file` backend which is not HA.
 
 > See the [official docs](https://developer.hashicorp.com/vault/docs/configuration) for more information.
 
-## Installing the Chart
+## Installation
 
 To install the chart, use the following:
 
@@ -36,10 +30,26 @@ helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault
 To install the chart backed with a Consul cluster, use the following:
 
 ```bash
-helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault --set vault.config.storage.consul.address="myconsul-svc-name:8500",vault.config.storage.consul.path="vault"
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
+--set vault.config.storage.consul.path="vault" \
+--set vault.config.storage.consul.address="myconsul-svc-name:8500"
 ```
 
 > Consul helm chart configuration is needed to [expose the service ports](https://developer.hashicorp.com/consul/docs/k8s/helm#v-server-exposeservice) and set up [Consul DNS request resolution](https://developer.hashicorp.com/consul/docs/k8s/dns).
+
+Note that we currently only distribute the chart via GitHub OCI registry.
+
+## Using Vault
+
+Once the Vault pod is ready, it can be accessed using `kubectl port-forward`:
+
+```bash
+$ kubectl port-forward vault-pod 8200
+$ export VAULT_ADDR=http://127.0.0.1:8200
+$ vault status
+```
+
+## Amazon S3 example
 
 An alternative `values.yaml` example using the Amazon S3 backend can be specified using:
 
@@ -51,20 +61,22 @@ vault:
         access_key: "AWS-ACCESS-KEY"
         secret_key: "AWS-SECRET-KEY"
         bucket: "AWS-BUCKET"
-        region: "eu-central-1"
+        region: "AWS-REGION"
 ```
 
 An alternate example using Amazon custom secrets passed as environment variables to Vault:
 
 ```bash
-# Create an aws secret with your AWS credentials
-kubectl create secret generic aws --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+# Create an Kubernetes secret with your AWS credentials
+kubectl create secret generic aws \
+--from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+--from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 # Tell the chart to pass these as env vars to Vault and as a file mount if needed
-helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault --set "vault.customSecrets[0].secretName=aws" --set "vault.customSecrets[0].mountPath=/vault/aws"
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
+--set "vault.customSecrets[0].secretName=aws" \
+--set "vault.customSecrets[0].mountPath=/vault/aws"
 ```
-
-Note that currently we only support OCI charts. If you wish to use
 
 ## Google Storage and KMS example
 
@@ -105,7 +117,9 @@ See the complete working Helm example below:
 
 ```bash
 # Install MySQL first with the official Helm chart, tell to create a user and a database called 'vault':
-helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql --set auth.username=vault --set auth.database=vault
+helm install mysql oci://registry-1.docker.io/bitnamicharts/mysql \
+--set auth.username=vault \
+--set auth.database=vault
 
 # Install the Vault chart, tell it to use MySQL as the storage backend, also specify where the 'vault' user's password should be coming from (the MySQL chart generates a secret called 'mysql' holding the password):
 helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
@@ -184,15 +198,6 @@ The following table lists the configurable parameters of the Helm chart.
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
-## Using Vault
-
-Once the Vault pod is ready, it can be accessed using `kubectl port-forward`:
-
-```bash
-$ kubectl port-forward vault-pod 8200
-$ export VAULT_ADDR=http://127.0.0.1:8200
-$ vault status
-```
 ## OpenShift Implementation
 
 Tested with
@@ -256,11 +261,18 @@ users:
 - system:serviceaccount:default:vault
 ```
 
-You will get the message, that the user system:serviceaccount:vault:vault doesn't exist, but that's ok.
+You will get the message, that the user `system:serviceaccount:vault:vault` doesn't exist, but that's ok.
 In the next step you install the helm chart vault in the namespace "vault" with the following command:
 
 ```bash
-helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault --set "unsealer.args[0]=--mode" --set "unsealer.args[1]=k8s" --set "unsealer.args[2]=--k8s-secret-namespace" --set "unsealer.args[3]=vault" --set "unsealer.args[4]=--k8s-secret-name" --set "unsealer.args[5]=bank-vaults"
+helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
+--set "unsealer.args[0]=--mode" \
+--set "unsealer.args[1]=k8s" \
+--set "unsealer.args[2]=--k8s-secret-namespace" \
+--set "unsealer.args[3]=vault" \
+--set "unsealer.args[4]=--k8s-secret-name" \
+--set "unsealer.args[5]=bank-vaults"
 ```
 
-Changing the values of the arguments of the unsealer is necessary because in the values.yaml the default namespace is used to store the secret. Creating the secret in the same namespace like vault is the easiest solution. In alternative you can create a role which allows creating and read secrets in the default namespace.
+Changing the values of the arguments of the unsealer is necessary because in the `values.yaml` the default namespace is used to store the secret.
+Creating the secret in the same namespace like vault is the easiest solution. In alternative you can create a role which allows creating and read secrets in the default namespace.
