@@ -2,9 +2,8 @@
 
 {{ template "chart.description" . }}
 
-{{ template "chart.homepageLine" . }}
-
-This directory contains a Kubernetes Helm chart to deploy a Vault server. For further details of how are we using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
+This directory contains a Kubernetes Helm chart to deploy a [Vault](https://www.vaultproject.io/) server.
+For further details on how we are using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
 
 **Requirements**
 
@@ -12,7 +11,7 @@ This directory contains a Kubernetes Helm chart to deploy a Vault server. For fu
 
 **Notes**
 
-Please note that a backend service for Vault (for example, Consul) must be deployed beforehand and configured with the `vault.config` option.
+Please note that a backend service for Vault (for example, Consul) must be deployed beforehand and configured with the `vault.config` option.<br>
 YAML provided under this option will be converted to JSON for the final Vault `config.json` file.
 
 Please also note that scaling to more than 1 replicas can be made successfully only with a configured HA Storage backend.
@@ -32,7 +31,7 @@ To install the chart backed with a Consul cluster, use the following:
 
 ```bash
 helm install vault oci://ghcr.io/bank-vaults/helm-charts/vault \
---set vault.config.storage.consul.path="vault"
+--set vault.config.storage.consul.path="vault" \
 --set vault.config.storage.consul.address="myconsul-svc-name:8500"
 ```
 
