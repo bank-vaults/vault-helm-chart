@@ -2,39 +2,45 @@
 
 export PATH := $(abspath bin/):${PATH}
 
-# Dependency versions
-KIND_VERSION = 0.20.0
-HELM_DOCS_VERSION = 1.11.0
+##@ General
+
+# Targets commented with ## will be visible in "make help" info.
+# Comments marked with ##@ will be used as categories for a group of targets.
+
+.PHONY: help
+default: help
+help: ## Display this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+##@ Development
 
 .PHONY: up
 up: ## Start development environment
-	kind create cluster
-
-.PHONY: stop
-stop: ## Stop development environment
-	# TODO: consider using k3d instead
-	kind delete cluster
+	$(KIND_BIN) create cluster
 
 .PHONY: down
 down: ## Destroy development environment
-	kind delete cluster
+	$(KIND_BIN) delete cluster
 
-.PHONY: build
-build: ## Build binary
-	@mkdir -p build
-	go build -race -o build/manager ./cmd/manager
+##@ Build
 
 .PHONY: artifacts
-artifacts: helm-chart
+artifacts: generate helm-chart
 artifacts: ## Build artifacts
 
 .PHONY: helm-chart
 helm-chart: ## Build Helm chart
 	@mkdir -p build
-	helm package -d build/ vault
+	$(HELM_BIN) package -d build/ vault
+
+.PHONY: generate
+generate: ## Generate Helm chart documentation
+	$(HELM_DOCS_BIN) -s file -c ./vault -t README.md.gotmpl
+
+##@ Checks
 
 .PHONY: check
-check: test lint ## Run checks (tests and linters)
+check: lint test-acceptance ## Run lint checks and tests
 
 .PHONY: test-acceptance
 test-acceptance: ## Run acceptance tests
@@ -42,38 +48,47 @@ test-acceptance: ## Run acceptance tests
 
 .PHONY: lint
 lint: lint-helm lint-yaml
-lint: ## Run linters
+lint: ## Run lint checks
 
 .PHONY: lint-helm
 lint-helm:
-	helm lint vault
+	$(HELM_BIN) lint vault
 
 .PHONY: lint-yaml
 lint-yaml:
 	yamllint $(if ${CI},-f github,) --no-warnings .
 
-.PHONY: generate
-generate: generate-helm-docs
-generate: ## Run generation jobs
+##@ Dependencies
 
-.PHONY: generate-helm-docs
-generate-helm-docs:
-	helm-docs -s file -c ./vault -t README.md.gotmpl
-
-deps: bin/kind bin/helm-docs
+deps: bin/kind bin/helm-docs bin/helm
 deps: ## Install dependencies
+
+# Dependency versions
+KIND_VERSION = 0.20.0
+HELM_DOCS_VERSION = 1.11.0
+
+# Dependency binaries
+KIND_BIN := kind
+HELM_BIN := helm
+HELM_DOCS_BIN := helm-docs
+
+# If we have "bin" dir, use those binaries instead
+ifneq ($(wildcard ./bin/.),)
+	KIND_BIN := bin/$(KIND_BIN)
+	HELM_BIN := bin/$(HELM_BIN)
+	HELM_DOCS_BIN := bin/$(HELM_DOCS_BIN)
+endif
 
 bin/kind:
 	@mkdir -p bin
 	curl -Lo bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-$(shell uname -s | tr '[:upper:]' '[:lower:]')-$(shell uname -m | sed -e "s/aarch64/arm64/; s/x86_64/amd64/")
 	@chmod +x bin/kind
 
+bin/helm:
+	@mkdir -p bin
+	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | USE_SUDO=false HELM_INSTALL_DIR=bin bash
+
 bin/helm-docs:
 	@mkdir -p bin
 	curl -L https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_$(shell uname)_x86_64.tar.gz | tar -zOxf - helm-docs > ./bin/helm-docs
 	@chmod +x bin/helm-docs
-
-.PHONY: help
-.DEFAULT_GOAL := help
-help:
-	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
