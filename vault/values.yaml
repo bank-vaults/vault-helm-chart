@@ -327,6 +327,27 @@ statsd:
       enabled: false
       additionalLabels: {}
 
+# Add Velero fsfreeze sidecar container and supporting hook annotations to Vault Pods:
+# https://velero.io/docs/v1.11/backup-hooks/
+velero:
+  enabled: false
+  image:
+    repository: ubuntu
+    tag: bionic
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 32Mi
+  annotations:
+    pre.hook.backup.velero.io/container:  "velero-fsfreeze"
+    pre.hook.backup.velero.io/command:    "[\"/sbin/fsfreeze\", \"--freeze\", \"/vault/file/\"]"
+    post.hook.backup.velero.io/container: "velero-fsfreeze"
+    post.hook.backup.velero.io/command:   "[\"/sbin/fsfreeze\", \"--unfreeze\", \"/vault/file/\"]"
+
 rbac:
   psp:
     # -- Use pod security policy
