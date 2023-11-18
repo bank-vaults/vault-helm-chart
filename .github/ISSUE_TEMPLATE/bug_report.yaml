@@ -1,6 +1,6 @@
 name: 🐛 Bug report
 description: Report a bug to help us improve the Vault Helm Chart
-labels: [bug]
+labels: [kind/bug]
 body:
   - type: markdown
     attributes:
@@ -19,6 +19,8 @@ body:
           required: true
         - label: I am not looking for support or already pursued the available [support channels](https://github.com/bank-vaults/vault-helm-chart/issues/new/choose) without success.
           required: true
+        - label: I agree to follow the [Code of Conduct](https://bank-vaults.dev/docs/code-of-conduct/).
+          required: true
   - type: input
     attributes:
       label: Vault Helm Chart Version
@@ -26,21 +28,6 @@ body:
       placeholder: 1.20.0
     validations:
       required: true
-  - type: input
-    attributes:
-      label: Operator Version
-      description: What version of the Operator are you using?
-      placeholder: 1.20.0
-    validations:
-      required: true
-  - type: dropdown
-    attributes:
-      label: Installation Type
-      description: How did you install the Operator?
-      options:
-        - Official Helm chart
-        - Custom Helm chart
-        - Other (specify below)
   - type: input
     attributes:
       label: Bank-Vaults Version
@@ -83,19 +70,8 @@ body:
         4. See error...
   - type: textarea
     attributes:
-      label: Configuration
-      description: Contents of Vault CustomResource.
-      render: yaml
-      placeholder: |
-        apiVersion: "vault.banzaicloud.com/v1alpha1"
-        kind: "Vault"
-        metadata:
-          name: "vault"
-        # ...
-  - type: textarea
-    attributes:
       label: Logs
-      description: Operator application logs (if relevant).
+      description: Vault logs (if relevant).
       render: shell
   - type: textarea
     attributes:
