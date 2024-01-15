@@ -88,7 +88,7 @@ jobs:
           echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
 
       - name: Upload chart as artifact
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # v4.1.0
         with:
           name: "[${{ github.job }}] Helm chart"
           path: ${{ steps.build.outputs.package }}
@@ -108,7 +108,7 @@ jobs:
         if: inputs.publish && inputs.release
 
       - name: Upload package as artifact
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # v4.1.0
         with:
           name: "[${{ github.job }}] package"
           path: ${{ steps.build.outputs.package }}
@@ -122,7 +122,7 @@ jobs:
           output: trivy-results.sarif
 
       - name: Upload Trivy scan results as artifact
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # v4.1.0
         with:
           name: "[${{ github.job }}] Trivy scan results"
           path: trivy-results.sarif
