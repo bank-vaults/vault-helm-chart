@@ -54,7 +54,6 @@ func TestVaultHelmChartAllNamespaces(t *testing.T) {
 	kubectlOptions := k8s.NewKubectlOptions("", "", "default")
 
 	// Set caNamespaces and other configurations to "*"
-	os.Setenv("VAULT_VERSION", "latest")
 	os.Setenv("CA_NAMESPACES", "*")
 	os.Setenv("BOUND_SA_NAMES", "*")
 	os.Setenv("BOUND_SA_NAMESPACES", "*")
@@ -91,8 +90,6 @@ func TestVaultHelmChartAllNamespaces(t *testing.T) {
 	// Get the TLS secret
 	k8s.GetSecret(t, kubectlOptions, "vault-tls")
 
-	// Unset environment variables to avoid interfering with other tests
-	os.Unsetenv("VAULT_VERSION")
 	os.Unsetenv("CA_NAMESPACES")
 	os.Unsetenv("BOUND_SA_NAMES")
 	os.Unsetenv("BOUND_SA_NAMESPACES")
