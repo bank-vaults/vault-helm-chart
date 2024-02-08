@@ -16,9 +16,9 @@
 // +build kubeall helm
 
 // Fire up a local Kubernetes cluster (`kind create cluster --config test/kind.yaml`)
-// and run the acceptance tests against it (`go test -v -tags kubeall ./test`)
+// and run the test against it (`go test -v -tags kubeall ./test/acceptance`)
 
-package test
+package acceptance
 
 import (
 	"os"
@@ -37,8 +37,9 @@ var (
 // Installing the operator helm chart before testing
 func TestMain(m *testing.M) {
 	// Setting Vault version
-	if os.Getenv("VAULT_VERSION") != "" {
-		vaultVersion = os.Getenv("VAULT_VERSION")
+	vaultVersionEnv, ok := os.LookupEnv("VAULT_VERSION")
+	if ok {
+		vaultVersion = vaultVersionEnv
 	}
 
 	// Run tests
@@ -69,8 +70,9 @@ func TestVaultHelmChart(t *testing.T) {
 		},
 	}
 
-	chart := "../vault/"
-	if v := os.Getenv("HELM_CHART"); v != "" {
+	chart := "../../vault/"
+	v, ok := os.LookupEnv("HELM_CHART")
+	if ok {
 		chart = v
 	}
 
@@ -78,6 +80,6 @@ func TestVaultHelmChart(t *testing.T) {
 	helm.Install(t, options, chart, releaseName)
 	defer helm.Delete(t, options, releaseName, true)
 
-	// Check the Vault pod to be up and running
+	// Wait for the Vault pods to be up and running
 	k8s.WaitUntilPodAvailable(t, kubectlOptions, "vault-0", 5, 10*time.Second)
 }

@@ -30,6 +30,7 @@ make up
 Run the test suite:
 
 ```shell
+make test
 make test-acceptance
 ```
 

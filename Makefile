@@ -40,11 +40,15 @@ generate: ## Generate Helm chart documentation
 ##@ Checks
 
 .PHONY: check
-check: lint test-acceptance ## Run lint checks and tests
+check: lint test test-acceptance ## Run lint checks and tests
+
+.PHONY: test
+test: ## Run tests
+	go test -race -v -timeout 900s -tags kubeall ./test
 
 .PHONY: test-acceptance
 test-acceptance: ## Run acceptance tests
-	go test -race -v -timeout 900s -tags kubeall ./test
+	go test -race -v -timeout 900s -tags kubeall ./test/acceptance
 
 .PHONY: lint
 lint: lint-helm lint-yaml
