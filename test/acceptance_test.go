@@ -16,9 +16,9 @@
 // +build kubeall helm
 
 // Fire up a local Kubernetes cluster (`kind create cluster --config test/kind.yaml`)
-// and run the acceptance test against it (`go test -v -tags kubeall ./test/acceptance`)
+// and run the acceptance test against it (`go test -v -tags kubeall ./test`)
 
-package acceptance
+package test
 
 import (
 	"os"
