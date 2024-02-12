@@ -190,9 +190,9 @@ vault:
 
     # Check https://www.vaultproject.io/docs/configuration/storage/ for supported storage backends.
     # @ignored
-    storage: {}
-      # file:
-      #   path: "/vault/file"
+    storage:
+      file:
+        path: "/vault/file"
       #
       # consul:
       #   address: ""
@@ -254,14 +254,6 @@ vault:
         description: General secrets.
         options:
           version: 2
-
-  # Until this issue is fixed: https://github.com/kubernetes/helm/issues/3117
-  # we have to workaround the default storage problem.
-  # @ignored
-  defaultStorage:
-    storage:
-      file:
-        path: "/vault/file"
 
   # @ignored
   logLevel: info
