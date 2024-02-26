@@ -142,7 +142,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `replicaCount` | int | `1` | Number of replicas |
 | `strategy.type` | string | `"RollingUpdate"` | Update strategy to use for Vault StatefulSet |
 | `image.repository` | string | `"hashicorp/vault"` | Container image repo that contains HashiCorp Vault |
-| `image.tag` | string | `"1.14.1"` | Container image tag |
+| `image.tag` | string | `"1.14.8"` | Container image tag |
 | `image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `service.name` | string | `"vault"` | Vault service name |
 | `service.type` | string | `"ClusterIP"` | Vault service type |
@@ -174,7 +174,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.config` | object | `{}` | A YAML representation of the final Vault config file. Check: https://developer.hashicorp.com/vault/docs/configuration |
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: https://bank-vaults.dev/docs/external-configuration/ |
 | `unsealer.image.repository` | string | `"ghcr.io/bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
-| `unsealer.image.tag` | string | `"1.20.4"` | Container image tag |
+| `unsealer.image.tag` | string | `"v1.31.0"` | Container image tag |
 | `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
 | `statsd.image.tag` | string | `"latest"` | Container image tag |
