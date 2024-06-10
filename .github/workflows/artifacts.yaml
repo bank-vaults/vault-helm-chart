@@ -114,7 +114,7 @@ jobs:
           path: ${{ steps.build.outputs.package }}
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@fd25fed6972e341ff0007ddb61f77e88103953c2 # 0.21.0
+        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d # 0.22.0
         with:
           scan-type: config
           scan-ref: ${{ steps.chart-name.outputs.value }}
