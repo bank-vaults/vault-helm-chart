@@ -263,7 +263,7 @@ unsealer:
     # -- Container image repo that contains Bank-Vaults
     repository: ghcr.io/bank-vaults/bank-vaults
     # -- Container image tag
-    tag: "v1.31.0"
+    tag: "v1.31.1"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
 
