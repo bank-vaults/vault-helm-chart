@@ -2,7 +2,7 @@ module github.com/bank-vaults/vault-helm-chart
 
 go 1.21.3
 
-require github.com/gruntwork-io/terratest v0.46.16
+require github.com/gruntwork-io/terratest v0.47.0
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
