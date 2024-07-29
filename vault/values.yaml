@@ -335,6 +335,14 @@ serviceAccount:
   annotations: {}
   # -- Bind `system:auth-delegator` ClusterRoleBinding to this service account
   createClusterRoleBinding: true
+  # -- secret-cleanup Job image
+  secretCleanupImage:
+    # -- secret-cleanup Job image repo that contains StatsD Prometheus exporter
+    repository: rancher/hyperkube
+    # -- secret-cleanup Job image tag
+    tag: v1.30.2-rancher1
+    # -- secret-cleanup Job image pull policy
+    pullPolicy: IfNotPresent
 
 # @ignored
 vaultConfig:

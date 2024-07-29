@@ -184,6 +184,10 @@ The following table lists the configurable parameters of the Helm chart.
 | `serviceAccount.name` | string | `""` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. |
 | `serviceAccount.annotations` | object | `{}` | Annotations to add to the service account. For example, use `iam.gke.io/gcp-service-account: gsa@project.iam.gserviceaccount.com` to enable GKE workload identity. |
 | `serviceAccount.createClusterRoleBinding` | bool | `true` | Bind `system:auth-delegator` ClusterRoleBinding to this service account |
+| `serviceAccount.secretCleanupImage` | object | `{"pullPolicy":"IfNotPresent","repository":"rancher/hyperkube","tag":"v1.30.2-rancher1"}` | secret-cleanup Job image |
+| `serviceAccount.secretCleanupImage.repository` | string | `"rancher/hyperkube"` | secret-cleanup Job image repo that contains StatsD Prometheus exporter |
+| `serviceAccount.secretCleanupImage.tag` | string | `"v1.30.2-rancher1"` | secret-cleanup Job image tag |
+| `serviceAccount.secretCleanupImage.pullPolicy` | string | `"IfNotPresent"` | secret-cleanup Job image pull policy |
 | `certManager` | object | `{}` | Configure CertManager issuer and certificate. If enabled, please see necessary changes to `vault.config.listener.tcp` above. Either `issuerRef` must be set to your Issuer or issuer must be enabled to generate a SelfSigned one. |
 | `podDisruptionBudget.enabled` | bool | `true` | Enables PodDisruptionBudget |
 | `podDisruptionBudget.maxUnavailable` | int | `1` | Represents the number of Pods that can be unavailable (integer or percentage) |
