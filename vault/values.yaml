@@ -190,9 +190,9 @@ vault:
 
     # Check https://www.vaultproject.io/docs/configuration/storage/ for supported storage backends.
     # @ignored
-    storage:
-      file:
-        path: "/vault/file"
+    storage: {}
+      # file:
+      #   path: "/vault/file"
       #
       # consul:
       #   address: ""
