@@ -51,7 +51,7 @@ ingress:
 
   # -- Vault ingress class name.
   # For Kubernetes >= 1.18, you should specify the ingress-controller via this field.
-  # Check: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # Check: <https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress>
   ingressClassName: ""
 
   # -- Vault ingress annotations
@@ -73,7 +73,7 @@ ingress:
 
 persistence:
   # -- Enable persistence using Persistent Volume Claims.
-  # Check: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  # Check: <http://kubernetes.io/docs/user-guide/persistent-volumes/>
   enabled: false
 
   # -- Set Vault data Persistent Volume Storage Class.
@@ -86,14 +86,14 @@ persistence:
 
   # -- Used for hostPath persistence if PVC is disabled.
   # If both PVC and hostPath persistence are disabled, "emptyDir" will be used.
-  # Check: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
+  # Check: <https://kubernetes.io/docs/concepts/storage/volumes/#hostpath>
   hostPath: ""
 
   # -- Set default PVC size
   size: 10G
 
   # -- Set default PVC access mode.
-  # Check: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
+  # Check: <https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes>
   accessMode: ReadWriteOnce
 
 # -- Containers to run before the Vault containers are started (init containers)
@@ -160,7 +160,7 @@ vault:
     #   value: /etc/gcp/service-account.json
 
   # -- A YAML representation of the final Vault config file.
-  # Check: https://developer.hashicorp.com/vault/docs/configuration
+  # Check: <https://developer.hashicorp.com/vault/docs/configuration>
   config:
     # @ignored
     listener:
@@ -188,7 +188,7 @@ vault:
     # @ignored
     disable_mlock: false
 
-    # Check https://www.vaultproject.io/docs/configuration/storage/ for supported storage backends.
+    # Check <https://www.vaultproject.io/docs/configuration/storage/> for supported storage backends.
     # @ignored
     storage:
       file:
@@ -216,15 +216,15 @@ vault:
       #
 
     ## @ignored
-    # api_addr: http://localhost:8200
+    # api_addr: <http://localhost:8200>
 
   # -- A YAML representation of dynamic config data used by Bank-Vaults.
   # Bank-Vaults will use this data to continuously configure Vault.
-  # Check: https://bank-vaults.dev/docs/external-configuration/
+  # Check: <https://bank-vaults.dev/docs/external-configuration/>
   externalConfig:
     # Allows creating policies in Vault which can be used later on in roles
     # for the Kubernetes based authentication.
-    # See https://www.vaultproject.io/docs/concepts/policies.html for more information.
+    # See <https://www.vaultproject.io/docs/concepts/policies.html> for more information.
     # @ignored
     policies:
       - name: allow_secrets
@@ -238,7 +238,7 @@ vault:
       - type: kubernetes
         # Allows creating roles in Vault which can be used later on for the Kubernetes based
         # authentication.
-        # See https://www.vaultproject.io/docs/auth/kubernetes.html#creating-a-role.
+        # See <https://www.vaultproject.io/docs/auth/kubernetes.html#creating-a-role>
         roles:
           # Allow every pod in the default namespace to use the secret kv store
           - name: default
@@ -425,11 +425,11 @@ resources:
   #   memory: 128Mi
 
 # -- Node labels for pod assignment.
-# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+# Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector>
 nodeSelector: {}
 
 # -- List of node tolerations for the pods.
-# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+# Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/>
 tolerations: []
   # - effect: NoSchedule
   #   key: "key"
@@ -438,11 +438,11 @@ tolerations: []
 
 # Node affinity settings for the pods.
 # If not set, it defaults `podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution`
-# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+# Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/>
 affinity: {}
 
 # -- Assign a PriorityClassName to pods if set.
-# Check: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+# Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/>
 priorityClassName: ""
 
 # -- Override cluster version

@@ -44,7 +44,7 @@ jobs:
         run: nix develop --impure .#ci
 
       - name: Lint
-        run: nix develop --impure .#ci -c make lint
+        run: nix develop --impure .#ci -c make lint -j
 
   dev:
     name: Developer environment
@@ -96,7 +96,7 @@ jobs:
     needs: [artifacts]
     strategy:
       matrix:
-        k8s_version: ["v1.24.15", "v1.25.11", "v1.26.6", "v1.27.3"]
+        k8s_version: ["v1.28.9", "v1.29.4", "v1.30.0"]
         vault_version: ["1.11.12", "1.12.8", "1.13.4", "1.14.8"]
 
     steps:

@@ -25,8 +25,7 @@ down: ## Destroy development environment
 ##@ Build
 
 .PHONY: artifacts
-artifacts: generate helm-chart
-artifacts: ## Build artifacts
+artifacts: helm-chart generate ## Build artifacts
 
 .PHONY: helm-chart
 helm-chart: ## Build Helm chart
@@ -40,7 +39,7 @@ generate: ## Generate Helm chart documentation
 ##@ Checks
 
 .PHONY: check
-check: lint test-acceptance ## Run lint checks and tests
+check: test-acceptance lint ## Run tests and lint checks
 
 .PHONY: test-acceptance
 test-acceptance: ## Run acceptance tests
@@ -56,16 +55,20 @@ lint-helm:
 
 .PHONY: lint-yaml
 lint-yaml:
-	yamllint $(if ${CI},-f github,) --no-warnings .
+	$(YAMLLINT_BIN) $(if ${CI},-f github,) --no-warnings .
+
+# TODO: add support for yamllint dependency
+YAMLLINT_BIN := yamllint
 
 ##@ Dependencies
 
-deps: bin/kind bin/helm-docs bin/helm
+deps: bin/kind bin/helm bin/helm-docs
 deps: ## Install dependencies
 
 # Dependency versions
-KIND_VERSION = 0.20.0
-HELM_DOCS_VERSION = 1.11.0
+KIND_VERSION = 0.24.0
+HELM_VERSION = 3.16.1
+HELM_DOCS_VERSION = 1.14.2
 
 # Dependency binaries
 KIND_BIN := kind
@@ -86,7 +89,7 @@ bin/kind:
 
 bin/helm:
 	@mkdir -p bin
-	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | USE_SUDO=false HELM_INSTALL_DIR=bin bash
+	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | USE_SUDO=false HELM_INSTALL_DIR=bin DESIRED_VERSION=v${HELM_VERSION} bash
 
 bin/helm-docs:
 	@mkdir -p bin
