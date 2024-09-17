@@ -5,7 +5,7 @@ A tool for secrets management, encryption as a service, and privileged access ma
 This directory contains a Kubernetes Helm chart to deploy a [Vault](https://www.vaultproject.io/) server.
 For further details on how we are using Vault read this [post](https://banzaicloud.com/blog/oauth2-vault/).
 
-### Requirements
+## Requirements
 
 * Kubernetes 1.6+
 
@@ -44,9 +44,9 @@ Note that we currently only distribute the chart via GitHub OCI registry.
 Once the Vault pod is ready, it can be accessed using `kubectl port-forward`:
 
 ```bash
-$ kubectl port-forward vault-pod 8200
-$ export VAULT_ADDR=http://127.0.0.1:8200
-$ vault status
+kubectl port-forward vault-pod 8200
+export VAULT_ADDR=http://127.0.0.1:8200
+vault status
 ```
 
 ## Amazon S3 example
@@ -154,15 +154,15 @@ The following table lists the configurable parameters of the Helm chart.
 | `headlessService.port` | int | `8200` | Vault headless service external port |
 | `headlessService.annotations` | object | `{}` | Vault headless service annotations. For example, use `external-dns.alpha.kubernetes.io/hostname: vault.mydomain.com` to create record-set. |
 | `ingress.enabled` | bool | `false` | Enable Vault ingress |
-| `ingress.ingressClassName` | string | `""` | Vault ingress class name. For Kubernetes >= 1.18, you should specify the ingress-controller via this field. Check: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress |
+| `ingress.ingressClassName` | string | `""` | Vault ingress class name. For Kubernetes >= 1.18, you should specify the ingress-controller via this field. Check: <https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress> |
 | `ingress.annotations` | object | `{}` | Vault ingress annotations |
 | `ingress.hosts` | list | `[]` | Vault ingress accepted hostnames with path. Used to create Ingress record and should be used with `service.type: ClusterIP`. |
 | `ingress.tls` | list | `[]` | Vault ingress TLS configuration. TLS secrets must be manually created in the namespace. |
-| `persistence.enabled` | bool | `false` | Enable persistence using Persistent Volume Claims. Check: http://kubernetes.io/docs/user-guide/persistent-volumes/ |
+| `persistence.enabled` | bool | `false` | Enable persistence using Persistent Volume Claims. Check: <http://kubernetes.io/docs/user-guide/persistent-volumes/> |
 | `persistence.storageClass` | string | `nil` | Set Vault data Persistent Volume Storage Class. If defined, sets the actual `storageClassName: <storageClass>`. If set to "-", sets the actual `storageClassName: ""`, which disables dynamic provisioning. If undefined (the default) or set to null, no `storageClassName` spec is set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack). |
-| `persistence.hostPath` | string | `""` | Used for hostPath persistence if PVC is disabled. If both PVC and hostPath persistence are disabled, "emptyDir" will be used. Check: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath |
+| `persistence.hostPath` | string | `""` | Used for hostPath persistence if PVC is disabled. If both PVC and hostPath persistence are disabled, "emptyDir" will be used. Check: <https://kubernetes.io/docs/concepts/storage/volumes/#hostpath> |
 | `persistence.size` | string | `"10G"` | Set default PVC size |
-| `persistence.accessMode` | string | `"ReadWriteOnce"` | Set default PVC access mode. Check: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes |
+| `persistence.accessMode` | string | `"ReadWriteOnce"` | Set default PVC access mode. Check: <https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes> |
 | `extraInitContainers` | list | `[]` | Containers to run before the Vault containers are started (init containers) |
 | `extraContainers` | list | `[]` | Containers to run alongside Vault containers (sidecar containers) |
 | `extraContainerVolumes` | list | `[]` | Extra volume definitions for sidecar and init containers |
@@ -171,8 +171,8 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.customSecrets` | list | `[]` | Custom secrets available to Vault. Allows the mounting of various custom secrets to enable production Vault configurations. The two fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), and `mountPath` at which it should be mounted in the Vault container. |
 | `vault.envSecrets` | list | `[]` | Custom secrets available to Vault as env vars. Allows creating various custom environment variables from secrets to enable production Vault configurations. The three fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), `secretKey` in this secret and `envName` which will be the name of the env var in the containers. |
 | `vault.envs` | list | `[]` | Custom env vars available to Vault. |
-| `vault.config` | object | `{}` | A YAML representation of the final Vault config file. Check: https://developer.hashicorp.com/vault/docs/configuration |
-| `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: https://bank-vaults.dev/docs/external-configuration/ |
+| `vault.config` | object | `{}` | A YAML representation of the final Vault config file. Check: <https://developer.hashicorp.com/vault/docs/configuration> |
+| `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
 | `unsealer.image.repository` | string | `"ghcr.io/bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
 | `unsealer.image.tag` | string | `"v1.31.1"` | Container image tag |
 | `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
@@ -194,10 +194,10 @@ The following table lists the configurable parameters of the Helm chart.
 | `podAnnotations` | object | `{}` | Extra annotations to add to pod metadata |
 | `labels` | object | `{}` | Additional labels to be applied to the Vault StatefulSet and Pods |
 | `resources` | object | `{}` | Resources to request for Vault |
-| `nodeSelector` | object | `{}` | Node labels for pod assignment. Check: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
-| `tolerations` | list | `[]` | List of node tolerations for the pods. Check: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ |
+| `nodeSelector` | object | `{}` | Node labels for pod assignment. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector> |
+| `tolerations` | list | `[]` | List of node tolerations for the pods. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/> |
 | `affinity` | object | `{}` |  |
-| `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/ |
+| `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/> |
 | `kubeVersion` | string | `""` | Override cluster version |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
@@ -205,24 +205,30 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 ## OpenShift Implementation
 
 Tested with
+
 * OpenShift Container Platform 3.11
 * Helm 3
 
 First create a new project named "vault"
+
 ```bash
 oc new-project vault
 ```
+
 Then create a new `scc` based on the `scc` restricted and add the capability "IPC_LOCK". Now add the new scc to the ServiceAccount vault of the new vault project:
+
 ```bash
 oc adm policy add-scc-to-user <new_scc> system:serviceaccount:vault:vault
 ```
 
 Or you can define users in `scc` directly and in this case, you only have to create the `scc`.
+
 ```bash
 oc create -f <scc_file.yaml>
 ```
 
 Example vault-restricted `scc` with defined user:
+
 ```yaml
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
