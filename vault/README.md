@@ -174,7 +174,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.config` | object | `{}` | A YAML representation of the final Vault config file. Check: <https://developer.hashicorp.com/vault/docs/configuration> |
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
 | `unsealer.image.repository` | string | `"ghcr.io/bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
-| `unsealer.image.tag` | string | `"v1.31.1"` | Container image tag |
+| `unsealer.image.tag` | string | `"v1.31.2"` | Container image tag |
 | `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
 | `statsd.image.tag` | string | `"latest"` | Container image tag |
