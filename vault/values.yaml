@@ -214,6 +214,11 @@ vault:
       #   credentials_file: ""
       #   ha_enabled: "true"
       #
+    ## Helm merges the default chart values under vault.config.storage with the supplied storage value when generating the config.json for vault. This causes the vault container to error out due to the multiple storage blocks. We add defaultStorage block as a workaround for now
+    defaultStorage:
+      storage:
+        file:
+          path: "/vault/file"
 
     ## @ignored
     # api_addr: http://localhost:8200
