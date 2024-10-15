@@ -215,6 +215,10 @@ vault:
       #   ha_enabled: "true"
       #
 
+    defaultStorage:
+      file:
+        path: "/vault/file"
+
     ## @ignored
     # api_addr: http://localhost:8200
 
