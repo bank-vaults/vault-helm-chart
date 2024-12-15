@@ -90,13 +90,6 @@ jobs:
           helm package ${{ steps.chart-name.outputs.value }} --version ${{ steps.version.outputs.value }}
           echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
 
-      - name: Sign chart with GitHub OIDC Token
-        if: ${{ inputs.publish && github.repository_owner == 'bank-vaults' }} # Check if the workflow is called by the same GitHub organization
-        env:
-          PACKAGE: ${{ steps.build.outputs.package }}
-        run: |
-          cosign sign-blob --yes $PACKAGE
-
       - name: Upload chart as artifact
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
@@ -112,10 +105,29 @@ jobs:
         if: inputs.publish && inputs.release
 
       - name: Helm push
-        run: helm push ${{ steps.build.outputs.package }} oci://${{ steps.oci-registry-name.outputs.value }}
+        id: push
+        run: |
+          helm push ${{ steps.build.outputs.package }} oci://${{ steps.oci-registry-name.outputs.value }} &> push-metadata.txt
+          echo "digest=$(awk '/Digest: /{print $2}' push-metadata.txt)" >> "$GITHUB_OUTPUT"
         env:
           HELM_REGISTRY_CONFIG: ~/.docker/config.json
         if: inputs.publish && inputs.release
+
+      - name: Sign chart with GitHub OIDC Token
+        if: ${{ inputs.publish && inputs.release && github.repository_owner == 'bank-vaults' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: cosign sign --yes --rekor-url "https://rekor.sigstore.dev/" "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}"
+
+      - name: Verify signed chart with cosign
+        if: ${{ inputs.publish && inputs.release && github.repository_owner == 'bank-vaults' }} # Check if the workflow is called by the same GitHub organization
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          cosign verify "${{ steps.oci-chart-name.outputs.value }}@${DIGEST}" \
+            --rekor-url "https://rekor.sigstore.dev/" \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/artifacts.yaml@${{ github.ref }}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
 
       - name: Upload package as artifact
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
