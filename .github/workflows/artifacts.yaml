@@ -91,7 +91,7 @@ jobs:
           echo "package=${{ steps.chart-name.outputs.value }}-${{ steps.version.outputs.value }}.tgz" >> "$GITHUB_OUTPUT"
 
       - name: Upload chart as artifact
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: "[${{ github.job }}] Helm chart"
           path: ${{ steps.build.outputs.package }}
@@ -130,7 +130,7 @@ jobs:
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" | jq
 
       - name: Upload package as artifact
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: "[${{ github.job }}] package"
           path: ${{ steps.build.outputs.package }}
@@ -144,7 +144,7 @@ jobs:
           output: trivy-results.sarif
 
       - name: Upload Trivy scan results as artifact
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: "[${{ github.job }}] Trivy scan results"
           path: trivy-results.sarif
