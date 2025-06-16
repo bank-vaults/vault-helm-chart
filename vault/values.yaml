@@ -5,6 +5,9 @@
 global:
   # -- Specify if the chart is being deployed to OpenShift
   openshift: false
+  # -- (list) Specify image pull secrets to use for pulling images from private registries
+  imagePullSecrets: []
+    # - name: myregistrykey
   # -- (string) Specify explicitly the image registry to use; this will override the defined registry
   imageRegistry: ""
 
