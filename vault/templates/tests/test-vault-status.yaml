@@ -5,6 +5,7 @@ metadata:
   annotations:
     "helm.sh/hook": test-success
 spec:
+  imagePullSecrets: {{ include "vault.imagePullSecrets" . }}
   containers:
   - name: {{ .Release.Name }}-vault-status-test
     image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
