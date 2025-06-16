@@ -3,6 +3,8 @@
 # Declare variables to be passed into your templates.
 
 global:
+  # -- (true, false, auto) Specify if the chart is being deployed to OpenShift
+  openshift: auto
   compatibility:
     # -- Specify if empty seLinuxOptions would be omitted in securityContexts
     omitEmptySeLinuxOptions: true
