@@ -8,6 +8,8 @@ global:
   compatibility:
     # -- Specify if empty seLinuxOptions would be omitted in securityContexts
     omitEmptySeLinuxOptions: true
+  # -- (string) Specify explicitly the image registry to use; this will override the defined registry
+  imageRegistry: ""
 
 # -- Number of replicas
 replicaCount: 1
