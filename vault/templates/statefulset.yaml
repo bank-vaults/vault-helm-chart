@@ -77,7 +77,7 @@ spec:
 
       containers:
       - name: vault
-        image: {{ include "vault.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+        image: "{{ include "vault.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["vault", "server", "-config", "/vault/config/config.json"]
         env:
