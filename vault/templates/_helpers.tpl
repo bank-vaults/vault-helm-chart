@@ -92,6 +92,24 @@ Return the appropriate apiVersion for ingress.
 {{- end -}}
 
 {{/*
+Return the appropriate securityContext for vault container.
+This function adapts the security context by adding the IPC_LOCK capability if `vault.config.disable_mlock` is not enabled.
+*/}}
+{{- define "vault.bank-vaults.containerSecurityContext" -}}
+{{- $securityContext := (dict) -}}
+{{- if ($securityContext = include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" .) | fromYaml) | empty | not -}}
+    {{- $disableMlock := dig "vault" "config" "disable_mlock" false (index .Values "vault") | toString -}}
+    {{- if eq $disableMlock "false" -}}
+        {{- $capabilitiesAdd := dig "capabilities" "add" (list) $securityContext  -}}
+        {{- $capabilitiesAdd = append $capabilitiesAdd "IPC_LOCK" | uniq -}}
+        {{- $capabilities := (dict "add" $capabilitiesAdd) -}}
+        {{- $_ := set $securityContext "capabilities" $capabilities -}}
+    {{- end -}}
+{{- end -}}
+{{- $securityContext | toYaml -}}
+{{- end -}}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "vault.imagePullSecrets" -}}
