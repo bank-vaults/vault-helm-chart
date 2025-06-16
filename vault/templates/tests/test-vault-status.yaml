@@ -8,7 +8,7 @@ spec:
   imagePullSecrets: {{ include "vault.imagePullSecrets" . }}
   containers:
   - name: {{ .Release.Name }}-vault-status-test
-    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    image: {{ include "vault.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
     env:
       - name: VAULT_SKIP_VERIFY
         value: "true"

@@ -37,7 +37,7 @@ spec:
       imagePullSecrets: {{ include "vault.imagePullSecrets" . }}
       initContainers:
       - name: vault-config
-        image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultConfig.containerSecurityContext "context" $) | nindent 12 }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         command: ["template"]
@@ -77,7 +77,7 @@ spec:
 
       containers:
       - name: vault
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["vault", "server", "-config", "/vault/config/config.json"]
         env:
@@ -156,7 +156,7 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 10 }}
       - name: vault-unsealer
-        image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultUnsealer.containerSecurityContext "context" $) | nindent 10 }}
         command: ["bank-vaults", "unseal", "--init"]
@@ -198,7 +198,7 @@ spec:
         resources:
 {{ toYaml .Values.vaultUnsealer.resources | indent 10 }}
       - name: vault-configurer
-        image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultConfigurer.containerSecurityContext "context" $) | nindent 10 }}
         command: ["bank-vaults", "configure"]
@@ -241,7 +241,7 @@ spec:
 {{ toYaml .Values.vaultConfigurer.resources | indent 10 }}
 {{- if .Values.statsd.metrics.enabled }}
       - name: prometheus-statsd-exporter
-        image: "{{ .Values.statsd.image.repository }}:{{ .Values.statsd.image.tag }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.statsd.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.statsd.image.pullPolicy }}
         securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.prometheusStatsdExporter.containerSecurityContext "context" $) | nindent 10 }}
         args: ["--statsd.mapping-config=/tmp/statsd-mapping.conf"]
