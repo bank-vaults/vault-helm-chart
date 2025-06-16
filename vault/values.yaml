@@ -392,26 +392,42 @@ serviceAccount:
       # - name: myregistrykey
 
 
-# @ignored
 vaultConfig:
+  # -- (object) SecurityContext capabilities to add to the unsealer container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources: {}
 
-# @ignored
 vaultUnsealer:
+  # -- (object) SecurityContext capabilities to add to the unsealer container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources:
     requests:
       cpu: 50m
       memory: 64Mi
 
-# @ignored
 vaultConfigurer:
+  # -- (object) SecurityContext capabilities to add to the unsealer container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources:
     requests:
       cpu: 50m
       memory: 64Mi
 
-# @ignored
 prometheusStatsdExporter:
+  # -- (object) SecurityContext capabilities to add to the statsd container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources:
     requests:
       cpu: 50m

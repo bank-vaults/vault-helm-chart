@@ -38,6 +38,7 @@ spec:
       initContainers:
       - name: vault-config
         image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultConfig.containerSecurityContext "context" $) | nindent 12 }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         command: ["template"]
         args:
@@ -157,6 +158,7 @@ spec:
       - name: vault-unsealer
         image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultUnsealer.containerSecurityContext "context" $) | nindent 10 }}
         command: ["bank-vaults", "unseal", "--init"]
         args: {{ toJson .Values.unsealer.args }}
         env:
@@ -198,6 +200,7 @@ spec:
       - name: vault-configurer
         image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultConfigurer.containerSecurityContext "context" $) | nindent 10 }}
         command: ["bank-vaults", "configure"]
         args: {{ toJson (append .Values.unsealer.args "--disable-metrics") }}
         env:
@@ -240,6 +243,7 @@ spec:
       - name: prometheus-statsd-exporter
         image: {{ include "vault.images.image" (dict "imageRoot" .Values.statsd.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.statsd.image.pullPolicy }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.prometheusStatsdExporter.containerSecurityContext "context" $) | nindent 10 }}
         args: ["--statsd.mapping-config=/tmp/statsd-mapping.conf"]
         ports:
         - containerPort: {{ .Values.statsd.metrics.port }}
