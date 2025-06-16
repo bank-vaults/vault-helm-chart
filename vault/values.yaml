@@ -365,7 +365,7 @@ serviceAccount:
     pullPolicy: IfNotPresent
 
 vaultConfig:
-  # -- (object) SecurityContext capabilities to add to the unsealer container
+  # -- (object) SecurityContext capabilities to add to the vaultConfig container
   containerSecurityContext:
     # -- Enable container security context
     enabled: false
@@ -373,7 +373,7 @@ vaultConfig:
   resources: {}
 
 vaultUnsealer:
-  # -- (object) SecurityContext capabilities to add to the unsealer container
+  # -- (object) SecurityContext capabilities to add to the vaultUnsealer container
   containerSecurityContext:
     # -- Enable container security context
     enabled: false
@@ -384,7 +384,7 @@ vaultUnsealer:
       memory: 64Mi
 
 vaultConfigurer:
-  # -- (object) SecurityContext capabilities to add to the unsealer container
+  # -- (object) SecurityContext capabilities to add to the vaultConfigurer container
   containerSecurityContext:
     # -- Enable container security context
     enabled: false
@@ -395,7 +395,7 @@ vaultConfigurer:
       memory: 64Mi
 
 prometheusStatsdExporter:
-  # -- (object) SecurityContext capabilities to add to the statsd container
+  # -- (object) SecurityContext capabilities to add to the prometheusStatsdExporter container
   containerSecurityContext:
     # -- Enable container security context
     enabled: false

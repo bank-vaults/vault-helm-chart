@@ -173,7 +173,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `podSecurityContext` | object | `{"enabled":true,"fsGroup":65534}` | SecurityContext capabilities to add to the Vault pod |
 | `podSecurityContext.enabled` | bool | `true` | Enable pod security context |
 | `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/> |
-| `prometheusStatsdExporter.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the statsd container |
+| `prometheusStatsdExporter.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the prometheusStatsdExporter container |
 | `prometheusStatsdExporter.containerSecurityContext.enabled` | bool | `false` | Enable container security context |
 | `rbac.psp.enabled` | bool | `false` | Use pod security policy |
 | `replicaCount` | int | `1` | Number of replicas |
@@ -206,11 +206,11 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.envSecrets` | list | `[]` | Custom secrets available to Vault as env vars. Allows creating various custom environment variables from secrets to enable production Vault configurations. The three fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), `secretKey` in this secret and `envName` which will be the name of the env var in the containers. |
 | `vault.envs` | list | `[]` | Custom env vars available to Vault. |
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
-| `vaultConfig.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the unsealer container |
+| `vaultConfig.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the vaultConfig container |
 | `vaultConfig.containerSecurityContext.enabled` | bool | `false` | Enable container security context |
-| `vaultConfigurer.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the unsealer container |
+| `vaultConfigurer.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the vaultConfigurer container |
 | `vaultConfigurer.containerSecurityContext.enabled` | bool | `false` | Enable container security context |
-| `vaultUnsealer.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the unsealer container |
+| `vaultUnsealer.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the vaultUnsealer container |
 | `vaultUnsealer.containerSecurityContext.enabled` | bool | `false` | Enable container security context |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
