@@ -34,6 +34,7 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      imagePullSecrets: {{ include "vault.imagePullSecrets" . }}
       initContainers:
       - name: vault-config
         image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
