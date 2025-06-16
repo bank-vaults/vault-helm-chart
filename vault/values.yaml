@@ -30,6 +30,12 @@ podSecurityContext:
   enabled: true
   fsGroup: 65534
 
+# -- (object) SecurityContext capabilities to add to the Vault container
+containerSecurityContext:
+  # -- Enable container security context
+  enabled: true
+  readOnlyRootFilesystem: true
+
 service:
   # -- Vault service name
   name: vault
