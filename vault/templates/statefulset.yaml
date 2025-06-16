@@ -138,13 +138,7 @@ spec:
             {{ end }}
             path: /v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=299
             port: vault
-        securityContext:
-          readOnlyRootFilesystem: true
-          {{ if not .Values.vault.config.disable_mlock }}
-          capabilities:
-            add:
-            - IPC_LOCK
-          {{ end }}
+        securityContext: {{- include "vault.bank-vaults.containerSecurityContext" . | nindent 10 }}
         volumeMounts:
         - name: vault-config
           mountPath: /vault/config/
