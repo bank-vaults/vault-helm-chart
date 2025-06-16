@@ -34,6 +34,12 @@ image:
   pullSecrets: []
     # - name: myregistrykey
 
+# -- (object) SecurityContext capabilities to add to the Vault pod
+podSecurityContext:
+  # -- Enable pod security context
+  enabled: true
+  fsGroup: 65534
+
 service:
   # -- Vault service name
   name: vault
