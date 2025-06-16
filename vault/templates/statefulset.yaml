@@ -279,7 +279,7 @@ spec:
                   app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end }}
       serviceAccountName: {{ template "vault.serviceAccountName" . }}
-      securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 6 }}
+      securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
