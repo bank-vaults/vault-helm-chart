@@ -5,6 +5,8 @@
 global:
   # -- Specify if the chart is being deployed to OpenShift
   openshift: false
+  # -- (string) Specify explicitly the image registry to use; this will override the defined registry
+  imageRegistry: ""
 
 # -- Number of replicas
 replicaCount: 1
