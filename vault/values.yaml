@@ -30,6 +30,9 @@ image:
   tag: 1.14.8
   # -- Container image pull policy
   pullPolicy: IfNotPresent
+  # -- Container image pull secrets
+  pullSecrets: []
+    # - name: myregistrykey
 
 # -- (object) SecurityContext capabilities to add to the Vault pod
 podSecurityContext:
@@ -295,6 +298,10 @@ unsealer:
     tag: "v1.32.0"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
+    # -- Container image pull secrets
+    pullSecrets: []
+      # - name: myregistrykey
+
 
   # @ignored
   args:
@@ -332,6 +339,10 @@ statsd:
     tag: latest
     # -- Container image pull policy
     pullPolicy: IfNotPresent
+    # -- Container image pull secrets
+    pullSecrets: []
+      # - name: myregistrykey
+
 
   # @ignored
   config:
@@ -376,6 +387,10 @@ serviceAccount:
     tag: v1.30.2-rancher1
     # -- secret-cleanup Job image pull policy
     pullPolicy: IfNotPresent
+    # -- Container image pull secrets
+    pullSecrets: []
+      # - name: myregistrykey
+
 
 vaultConfig:
   # -- (object) SecurityContext capabilities to add to the unsealer container
