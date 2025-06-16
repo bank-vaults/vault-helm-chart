@@ -92,6 +92,13 @@ Return the appropriate apiVersion for ingress.
 {{- end -}}
 
 {{/*
+Return the proper Docker Image Registry Secret Names
+*/}}
+{{- define "vault.imagePullSecrets" -}}
+{{- (include "vault.images.renderPullSecrets" (dict "images" (list .Values.image .Values.serviceAccount.secretCleanupImage .Values.statsd.image .Values.unsealer.image ) "context" $) | fromYaml).imagePullSecrets | default (list) | mustToJson -}}
+{{- end -}}
+
+{{/*
 Return the appropriate securityContext for vault container.
 This function adapts the security context by adding the IPC_LOCK capability if `vault.config.disable_mlock` is not enabled.
 */}}
