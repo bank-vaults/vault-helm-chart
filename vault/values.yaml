@@ -3,8 +3,9 @@
 # Declare variables to be passed into your templates.
 
 global:
-  # -- Specify if the chart is being deployed to OpenShift
-  openshift: false
+  compatibility:
+    # -- Specify if empty seLinuxOptions would be omitted in securityContexts
+    omitEmptySeLinuxOptions: true
 
 # -- Number of replicas
 replicaCount: 1
