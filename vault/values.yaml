@@ -8,6 +8,9 @@ global:
   compatibility:
     # -- Specify if empty seLinuxOptions would be omitted in securityContexts
     omitEmptySeLinuxOptions: true
+  # -- (list) Specify image pull secrets to use for pulling images from private registries
+  imagePullSecrets: []
+    # - name: myregistrykey
   # -- (string) Specify explicitly the image registry to use; this will override the defined registry
   imageRegistry: ""
 
