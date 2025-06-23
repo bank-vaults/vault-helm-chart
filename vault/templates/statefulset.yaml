@@ -37,6 +37,7 @@ spec:
       initContainers:
       - name: vault-config
         image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultConfig.containerSecurityContext "context" $) | nindent 12 }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         command: ["template"]
         args:
@@ -137,13 +138,7 @@ spec:
             {{ end }}
             path: /v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=299
             port: vault
-        securityContext:
-          readOnlyRootFilesystem: true
-          {{ if not .Values.vault.config.disable_mlock }}
-          capabilities:
-            add:
-            - IPC_LOCK
-          {{ end }}
+        securityContext: {{- include "vault.bank-vaults.containerSecurityContext" . | nindent 10 }}
         volumeMounts:
         - name: vault-config
           mountPath: /vault/config/
@@ -162,6 +157,7 @@ spec:
       - name: vault-unsealer
         image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultUnsealer.containerSecurityContext "context" $) | nindent 10 }}
         command: ["bank-vaults", "unseal", "--init"]
         args: {{ toJson .Values.unsealer.args }}
         env:
@@ -203,6 +199,7 @@ spec:
       - name: vault-configurer
         image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.vaultConfigurer.containerSecurityContext "context" $) | nindent 10 }}
         command: ["bank-vaults", "configure"]
         args: {{ toJson (append .Values.unsealer.args "--disable-metrics") }}
         env:
@@ -245,6 +242,7 @@ spec:
       - name: prometheus-statsd-exporter
         image: "{{ .Values.statsd.image.repository }}:{{ .Values.statsd.image.tag }}"
         imagePullPolicy: {{ .Values.statsd.image.pullPolicy }}
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.prometheusStatsdExporter.containerSecurityContext "context" $) | nindent 10 }}
         args: ["--statsd.mapping-config=/tmp/statsd-mapping.conf"]
         ports:
         - containerPort: {{ .Values.statsd.metrics.port }}
@@ -281,10 +279,7 @@ spec:
                   app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end }}
       serviceAccountName: {{ template "vault.serviceAccountName" . }}
-      {{- if not .Values.global.openshift }}
-      securityContext:
-        fsGroup: 65534
-      {{- end }}
+      securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
