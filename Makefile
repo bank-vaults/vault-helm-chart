@@ -33,7 +33,7 @@ helm-chart: ## Build Helm chart
 	$(HELM_BIN) package -d build/ vault
 
 .PHONY: generate
-generate: ## Generate Helm chart documentation
+generate: bin/helm-docs ## Generate Helm chart documentation
 	$(HELM_DOCS_BIN) -s file -c ./vault -t README.md.gotmpl
 
 ##@ Checks

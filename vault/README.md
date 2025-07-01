@@ -171,10 +171,10 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.customSecrets` | list | `[]` | Custom secrets available to Vault. Allows the mounting of various custom secrets to enable production Vault configurations. The two fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), and `mountPath` at which it should be mounted in the Vault container. |
 | `vault.envSecrets` | list | `[]` | Custom secrets available to Vault as env vars. Allows creating various custom environment variables from secrets to enable production Vault configurations. The three fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), `secretKey` in this secret and `envName` which will be the name of the env var in the containers. |
 | `vault.envs` | list | `[]` | Custom env vars available to Vault. |
-| `vault.config` | object | `{}` | A YAML representation of the final Vault config file. Check: <https://developer.hashicorp.com/vault/docs/configuration> |
+| `vault.config` | object | `{"defaultStorage":{"storage":{"file":{"path":"/vault/file"}}}}` | A YAML representation of the final Vault config file. Check: <https://developer.hashicorp.com/vault/docs/configuration> |
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
 | `unsealer.image.repository` | string | `"ghcr.io/bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
-| `unsealer.image.tag` | string | `"v1.31.3"` | Container image tag |
+| `unsealer.image.tag` | string | `"v1.32.0"` | Container image tag |
 | `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
 | `statsd.image.tag` | string | `"latest"` | Container image tag |
