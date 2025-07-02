@@ -102,8 +102,8 @@ This function adapts the security context by adding the IPC_LOCK capability if `
     {{- if eq $disableMlock "false" -}}
         {{- $capabilitiesAdd := dig "capabilities" "add" (list) $securityContext  -}}
         {{- $capabilitiesAdd = append $capabilitiesAdd "IPC_LOCK" | uniq -}}
-        {{- $capabilities := (dict "add" $capabilitiesAdd) -}}
-        {{- $_ := mergeOverwrite (index $securityContext "capabilities") $capabilities -}}
+        {{- $_securityContext := (dict "capabilities" (dict "add" $capabilitiesAdd)) -}}
+        {{- $_ := mergeOverwrite $securityContext $_securityContext -}}
     {{- end -}}
 {{- end -}}
 {{- $securityContext | toYaml -}}
