@@ -500,7 +500,7 @@ tolerations: []
   #   operator: Equal
   #   value: "value"
 
-# Node affinity settings for the pods.
+# -- Node affinity settings for the pods.
 # If not set, it defaults `podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution`
 # Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/>
 affinity: {}
