@@ -98,12 +98,12 @@ This function adapts the security context by adding the IPC_LOCK capability if `
 {{- define "vault.bank-vaults.containerSecurityContext" -}}
 {{- $securityContext := (dict) -}}
 {{- if ($securityContext = include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" .) | fromYaml) | empty | not -}}
-    {{- $disableMlock := dig "vault" "config" "disable_mlock" false (index .Values "vault") | toString -}}
+    {{- $disableMlock := dig "config" "disable_mlock" false (index .Values "vault") | toString -}}
     {{- if eq $disableMlock "false" -}}
         {{- $capabilitiesAdd := dig "capabilities" "add" (list) $securityContext  -}}
         {{- $capabilitiesAdd = append $capabilitiesAdd "IPC_LOCK" | uniq -}}
         {{- $capabilities := (dict "add" $capabilitiesAdd) -}}
-        {{- $_ := set $securityContext "capabilities" $capabilities -}}
+        {{- $_ := mergeOverwrite (index $securityContext "capabilities") $capabilities -}}
     {{- end -}}
 {{- end -}}
 {{- $securityContext | toYaml -}}
