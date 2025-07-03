@@ -34,9 +34,10 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      imagePullSecrets: {{ include "vault.imagePullSecrets" . }}
       initContainers:
       - name: vault-config
-        image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         command: ["template"]
         args:
@@ -75,7 +76,7 @@ spec:
 
       containers:
       - name: vault
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "vault.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["vault", "server", "-config", "/vault/config/config.json"]
         env:
@@ -160,7 +161,7 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 10 }}
       - name: vault-unsealer
-        image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         command: ["bank-vaults", "unseal", "--init"]
         args: {{ toJson .Values.unsealer.args }}
@@ -201,7 +202,7 @@ spec:
         resources:
 {{ toYaml .Values.vaultUnsealer.resources | indent 10 }}
       - name: vault-configurer
-        image: "{{ .Values.unsealer.image.repository }}:{{ include "vault.bank-vaults.version" . }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.unsealer.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.unsealer.image.pullPolicy }}
         command: ["bank-vaults", "configure"]
         args: {{ toJson (append .Values.unsealer.args "--disable-metrics") }}
@@ -243,7 +244,7 @@ spec:
 {{ toYaml .Values.vaultConfigurer.resources | indent 10 }}
 {{- if .Values.statsd.metrics.enabled }}
       - name: prometheus-statsd-exporter
-        image: "{{ .Values.statsd.image.repository }}:{{ .Values.statsd.image.tag }}"
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.statsd.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.statsd.image.pullPolicy }}
         args: ["--statsd.mapping-config=/tmp/statsd-mapping.conf"]
         ports:
