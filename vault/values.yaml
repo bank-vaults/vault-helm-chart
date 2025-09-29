@@ -5,6 +5,11 @@
 global:
   # -- Specify if the chart is being deployed to OpenShift
   openshift: false
+  # -- (list) Specify image pull secrets to use for pulling images from private registries
+  imagePullSecrets: []
+    # - name: myregistrykey
+  # -- (string) Specify explicitly the image registry to use; this will override the defined registry
+  imageRegistry: ""
 
 # -- Number of replicas
 replicaCount: 1
@@ -14,12 +19,17 @@ strategy:
   type: RollingUpdate
 
 image:
+  # -- Container image registry that contains HashiCorp Vault
+  registry: docker.io
   # -- Container image repo that contains HashiCorp Vault
   repository: hashicorp/vault
   # -- Container image tag
   tag: 1.14.8
   # -- Container image pull policy
   pullPolicy: IfNotPresent
+  # -- Container image pull secrets
+  pullSecrets: []
+    # - name: myregistrykey
 
 service:
   # -- Vault service name
@@ -265,12 +275,18 @@ vault:
 
 unsealer:
   image:
+    # -- Container image registry that contains Bank-Vaults
+    registry: ghcr.io
     # -- Container image repo that contains Bank-Vaults
-    repository: ghcr.io/bank-vaults/bank-vaults
+    repository: bank-vaults/bank-vaults
     # -- Container image tag
     tag: "v1.32.0"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
+    # -- Container image pull secrets
+    pullSecrets: []
+      # - name: myregistrykey
+
 
   # @ignored
   args:
@@ -300,12 +316,18 @@ unsealer:
 
 statsd:
   image:
+    # -- Container image registry that contains StatsD Prometheus exporter
+    registry: docker.io
     # -- Container image repo that contains StatsD Prometheus exporter
     repository: prom/statsd-exporter
     # -- Container image tag
     tag: latest
     # -- Container image pull policy
     pullPolicy: IfNotPresent
+    # -- Container image pull secrets
+    pullSecrets: []
+      # - name: myregistrykey
+
 
   # @ignored
   config:
@@ -342,12 +364,18 @@ serviceAccount:
   createClusterRoleBinding: true
   # -- secret-cleanup Job image
   secretCleanupImage:
+    # -- secret-cleanup Job image registry that contains StatsD Prometheus exporter
+    registry: docker.io
     # -- secret-cleanup Job image repo that contains StatsD Prometheus exporter
     repository: rancher/hyperkube
     # -- secret-cleanup Job image tag
     tag: v1.30.2-rancher1
     # -- secret-cleanup Job image pull policy
     pullPolicy: IfNotPresent
+    # -- Container image pull secrets
+    pullSecrets: []
+      # - name: myregistrykey
+
 
 # @ignored
 vaultConfig:

@@ -138,67 +138,77 @@ The following table lists the configurable parameters of the Helm chart.
 
 | Parameter | Type | Default | Description |
 | --- | ---- | ------- | ----------- |
+| `affinity` | object | `{}` |  |
+| `certManager` | object | `{}` | Configure CertManager issuer and certificate. If enabled, please see necessary changes to `vault.config.listener.tcp` above. Either `issuerRef` must be set to your Issuer or issuer must be enabled to generate a SelfSigned one. |
+| `extraContainerVolumes` | list | `[]` | Extra volume definitions for sidecar and init containers |
+| `extraContainers` | list | `[]` | Containers to run alongside Vault containers (sidecar containers) |
+| `extraInitContainers` | list | `[]` | Containers to run before the Vault containers are started (init containers) |
+| `global.imagePullSecrets` | list | `[]` | Specify image pull secrets to use for pulling images from private registries |
+| `global.imageRegistry` | string | `""` | Specify explicitly the image registry to use; this will override the defined registry |
 | `global.openshift` | bool | `false` | Specify if the chart is being deployed to OpenShift |
-| `replicaCount` | int | `1` | Number of replicas |
-| `strategy.type` | string | `"RollingUpdate"` | Update strategy to use for Vault StatefulSet |
-| `image.repository` | string | `"hashicorp/vault"` | Container image repo that contains HashiCorp Vault |
-| `image.tag` | string | `"1.14.8"` | Container image tag |
-| `image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
-| `service.name` | string | `"vault"` | Vault service name |
-| `service.type` | string | `"ClusterIP"` | Vault service type |
-| `service.port` | int | `8200` | Vault service external port |
-| `service.loadBalancerIP` | string | `nil` | Force Vault load balancer IP |
-| `service.annotations` | object | `{}` | Vault service annotations. For example, use `cloud.google.com/load-balancer-type: "Internal"` to specify GCP load balancer type. |
+| `headlessService.annotations` | object | `{}` | Vault headless service annotations. For example, use `external-dns.alpha.kubernetes.io/hostname: vault.mydomain.com` to create record-set. |
 | `headlessService.enabled` | bool | `false` | Enable headless service for Vault |
 | `headlessService.name` | string | `"vault"` | Vault headless service name |
 | `headlessService.port` | int | `8200` | Vault headless service external port |
-| `headlessService.annotations` | object | `{}` | Vault headless service annotations. For example, use `external-dns.alpha.kubernetes.io/hostname: vault.mydomain.com` to create record-set. |
-| `ingress.enabled` | bool | `false` | Enable Vault ingress |
-| `ingress.ingressClassName` | string | `""` | Vault ingress class name. For Kubernetes >= 1.18, you should specify the ingress-controller via this field. Check: <https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress> |
+| `image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
+| `image.pullSecrets` | list | `[]` | Container image pull secrets |
+| `image.registry` | string | `"docker.io"` | Container image registry that contains HashiCorp Vault |
+| `image.repository` | string | `"hashicorp/vault"` | Container image repo that contains HashiCorp Vault |
+| `image.tag` | string | `"1.14.8"` | Container image tag |
 | `ingress.annotations` | object | `{}` | Vault ingress annotations |
+| `ingress.enabled` | bool | `false` | Enable Vault ingress |
 | `ingress.hosts` | list | `[]` | Vault ingress accepted hostnames with path. Used to create Ingress record and should be used with `service.type: ClusterIP`. |
+| `ingress.ingressClassName` | string | `""` | Vault ingress class name. For Kubernetes >= 1.18, you should specify the ingress-controller via this field. Check: <https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress> |
 | `ingress.tls` | list | `[]` | Vault ingress TLS configuration. TLS secrets must be manually created in the namespace. |
+| `kubeVersion` | string | `""` | Override cluster version |
+| `labels` | object | `{}` | Additional labels to be applied to the Vault StatefulSet and Pods |
+| `nodeSelector` | object | `{}` | Node labels for pod assignment. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector> |
+| `persistence.accessMode` | string | `"ReadWriteOnce"` | Set default PVC access mode. Check: <https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes> |
 | `persistence.enabled` | bool | `false` | Enable persistence using Persistent Volume Claims. Check: <http://kubernetes.io/docs/user-guide/persistent-volumes/> |
-| `persistence.storageClass` | string | `nil` | Set Vault data Persistent Volume Storage Class. If defined, sets the actual `storageClassName: <storageClass>`. If set to "-", sets the actual `storageClassName: ""`, which disables dynamic provisioning. If undefined (the default) or set to null, no `storageClassName` spec is set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack). |
 | `persistence.hostPath` | string | `""` | Used for hostPath persistence if PVC is disabled. If both PVC and hostPath persistence are disabled, "emptyDir" will be used. Check: <https://kubernetes.io/docs/concepts/storage/volumes/#hostpath> |
 | `persistence.size` | string | `"10G"` | Set default PVC size |
-| `persistence.accessMode` | string | `"ReadWriteOnce"` | Set default PVC access mode. Check: <https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes> |
-| `extraInitContainers` | list | `[]` | Containers to run before the Vault containers are started (init containers) |
-| `extraContainers` | list | `[]` | Containers to run alongside Vault containers (sidecar containers) |
-| `extraContainerVolumes` | list | `[]` | Extra volume definitions for sidecar and init containers |
-| `tls.secretName` | string | `""` | Specify a secret which holds your custom TLS certificate. If not specified, Helm will generate one for you. |
+| `persistence.storageClass` | string | `nil` | Set Vault data Persistent Volume Storage Class. If defined, sets the actual `storageClassName: <storageClass>`. If set to "-", sets the actual `storageClassName: ""`, which disables dynamic provisioning. If undefined (the default) or set to null, no `storageClassName` spec is set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack). |
+| `podAnnotations` | object | `{}` | Extra annotations to add to pod metadata |
+| `podDisruptionBudget.enabled` | bool | `true` | Enables PodDisruptionBudget |
+| `podDisruptionBudget.maxUnavailable` | int | `1` | Represents the number of Pods that can be unavailable (integer or percentage) |
+| `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/> |
+| `rbac.psp.enabled` | bool | `false` | Use pod security policy |
+| `replicaCount` | int | `1` | Number of replicas |
+| `resources` | object | `{}` | Resources to request for Vault |
+| `service.annotations` | object | `{}` | Vault service annotations. For example, use `cloud.google.com/load-balancer-type: "Internal"` to specify GCP load balancer type. |
+| `service.loadBalancerIP` | string | `nil` | Force Vault load balancer IP |
+| `service.name` | string | `"vault"` | Vault service name |
+| `service.port` | int | `8200` | Vault service external port |
+| `service.type` | string | `"ClusterIP"` | Vault service type |
+| `serviceAccount.annotations` | object | `{}` | Annotations to add to the service account. For example, use `iam.gke.io/gcp-service-account: gsa@project.iam.gserviceaccount.com` to enable GKE workload identity. |
+| `serviceAccount.create` | bool | `true` | Specifies whether a service account should be created |
+| `serviceAccount.createClusterRoleBinding` | bool | `true` | Bind `system:auth-delegator` ClusterRoleBinding to this service account |
+| `serviceAccount.name` | string | `""` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. |
+| `serviceAccount.secretCleanupImage` | object | `{"pullPolicy":"IfNotPresent","pullSecrets":[],"registry":"docker.io","repository":"rancher/hyperkube","tag":"v1.30.2-rancher1"}` | secret-cleanup Job image |
+| `serviceAccount.secretCleanupImage.pullPolicy` | string | `"IfNotPresent"` | secret-cleanup Job image pull policy |
+| `serviceAccount.secretCleanupImage.pullSecrets` | list | `[]` | Container image pull secrets |
+| `serviceAccount.secretCleanupImage.registry` | string | `"docker.io"` | secret-cleanup Job image registry that contains StatsD Prometheus exporter |
+| `serviceAccount.secretCleanupImage.repository` | string | `"rancher/hyperkube"` | secret-cleanup Job image repo that contains StatsD Prometheus exporter |
+| `serviceAccount.secretCleanupImage.tag` | string | `"v1.30.2-rancher1"` | secret-cleanup Job image tag |
+| `statsd.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
+| `statsd.image.pullSecrets` | list | `[]` | Container image pull secrets |
+| `statsd.image.registry` | string | `"docker.io"` | Container image registry that contains StatsD Prometheus exporter |
+| `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
+| `statsd.image.tag` | string | `"latest"` | Container image tag |
+| `strategy.type` | string | `"RollingUpdate"` | Update strategy to use for Vault StatefulSet |
 | `tls.caNamespaces` | list | `[]` | Distribute the generated CA certificate Secret to other namespaces |
+| `tls.secretName` | string | `""` | Specify a secret which holds your custom TLS certificate. If not specified, Helm will generate one for you. |
+| `tolerations` | list | `[]` | List of node tolerations for the pods. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/> |
+| `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
+| `unsealer.image.pullSecrets` | list | `[]` | Container image pull secrets |
+| `unsealer.image.registry` | string | `"ghcr.io"` | Container image registry that contains Bank-Vaults |
+| `unsealer.image.repository` | string | `"bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
+| `unsealer.image.tag` | string | `"v1.32.0"` | Container image tag |
+| `vault.config` | object | `{"defaultStorage":{"storage":{"file":{"path":"/vault/file"}}}}` | A YAML representation of the final Vault config file. Check: <https://developer.hashicorp.com/vault/docs/configuration> |
 | `vault.customSecrets` | list | `[]` | Custom secrets available to Vault. Allows the mounting of various custom secrets to enable production Vault configurations. The two fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), and `mountPath` at which it should be mounted in the Vault container. |
 | `vault.envSecrets` | list | `[]` | Custom secrets available to Vault as env vars. Allows creating various custom environment variables from secrets to enable production Vault configurations. The three fields required are `secretName` indicating the name of the Kubernetes secret (created outside of this chart), `secretKey` in this secret and `envName` which will be the name of the env var in the containers. |
 | `vault.envs` | list | `[]` | Custom env vars available to Vault. |
-| `vault.config` | object | `{"defaultStorage":{"storage":{"file":{"path":"/vault/file"}}}}` | A YAML representation of the final Vault config file. Check: <https://developer.hashicorp.com/vault/docs/configuration> |
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
-| `unsealer.image.repository` | string | `"ghcr.io/bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
-| `unsealer.image.tag` | string | `"v1.32.0"` | Container image tag |
-| `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
-| `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
-| `statsd.image.tag` | string | `"latest"` | Container image tag |
-| `statsd.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
-| `rbac.psp.enabled` | bool | `false` | Use pod security policy |
-| `serviceAccount.create` | bool | `true` | Specifies whether a service account should be created |
-| `serviceAccount.name` | string | `""` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. |
-| `serviceAccount.annotations` | object | `{}` | Annotations to add to the service account. For example, use `iam.gke.io/gcp-service-account: gsa@project.iam.gserviceaccount.com` to enable GKE workload identity. |
-| `serviceAccount.createClusterRoleBinding` | bool | `true` | Bind `system:auth-delegator` ClusterRoleBinding to this service account |
-| `serviceAccount.secretCleanupImage` | object | `{"pullPolicy":"IfNotPresent","repository":"rancher/hyperkube","tag":"v1.30.2-rancher1"}` | secret-cleanup Job image |
-| `serviceAccount.secretCleanupImage.repository` | string | `"rancher/hyperkube"` | secret-cleanup Job image repo that contains StatsD Prometheus exporter |
-| `serviceAccount.secretCleanupImage.tag` | string | `"v1.30.2-rancher1"` | secret-cleanup Job image tag |
-| `serviceAccount.secretCleanupImage.pullPolicy` | string | `"IfNotPresent"` | secret-cleanup Job image pull policy |
-| `certManager` | object | `{}` | Configure CertManager issuer and certificate. If enabled, please see necessary changes to `vault.config.listener.tcp` above. Either `issuerRef` must be set to your Issuer or issuer must be enabled to generate a SelfSigned one. |
-| `podDisruptionBudget.enabled` | bool | `true` | Enables PodDisruptionBudget |
-| `podDisruptionBudget.maxUnavailable` | int | `1` | Represents the number of Pods that can be unavailable (integer or percentage) |
-| `podAnnotations` | object | `{}` | Extra annotations to add to pod metadata |
-| `labels` | object | `{}` | Additional labels to be applied to the Vault StatefulSet and Pods |
-| `resources` | object | `{}` | Resources to request for Vault |
-| `nodeSelector` | object | `{}` | Node labels for pod assignment. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector> |
-| `tolerations` | list | `[]` | List of node tolerations for the pods. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/> |
-| `affinity` | object | `{}` |  |
-| `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/> |
-| `kubeVersion` | string | `""` | Override cluster version |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
