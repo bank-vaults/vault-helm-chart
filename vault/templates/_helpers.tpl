@@ -90,3 +90,10 @@ Return the appropriate apiVersion for ingress.
 {{- print "networking.k8s.io/v1" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the proper Docker Image Registry Secret Names
+*/}}
+{{- define "vault.imagePullSecrets" -}}
+{{- (include "vault.images.renderPullSecrets" (dict "images" (list .Values.image .Values.serviceAccount.secretCleanupImage .Values.statsd.image .Values.unsealer.image ) "context" $) | fromYaml).imagePullSecrets | default (list) | mustToJson -}}
+{{- end -}}
