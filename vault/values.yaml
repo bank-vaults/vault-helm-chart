@@ -3,8 +3,11 @@
 # Declare variables to be passed into your templates.
 
 global:
-  # -- Specify if the chart is being deployed to OpenShift
-  openshift: false
+  # -- (true, false, auto) Specify if the chart is being deployed to OpenShift
+  openshift: auto
+  compatibility:
+    # -- Specify if empty seLinuxOptions would be omitted in securityContexts
+    omitEmptySeLinuxOptions: true
   # -- (list) Specify image pull secrets to use for pulling images from private registries
   imagePullSecrets: []
     # - name: myregistrykey
@@ -30,6 +33,18 @@ image:
   # -- Container image pull secrets
   pullSecrets: []
     # - name: myregistrykey
+
+# -- (object) SecurityContext capabilities to add to the Vault pod
+podSecurityContext:
+  # -- Enable pod security context
+  enabled: true
+  fsGroup: 65534
+
+# -- (object) SecurityContext capabilities to add to the Vault container
+containerSecurityContext:
+  # -- Enable container security context
+  enabled: true
+  readOnlyRootFilesystem: true
 
 service:
   # -- Vault service name
@@ -377,26 +392,42 @@ serviceAccount:
       # - name: myregistrykey
 
 
-# @ignored
 vaultConfig:
+  # -- (object) SecurityContext capabilities to add to the unsealer container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources: {}
 
-# @ignored
 vaultUnsealer:
+  # -- (object) SecurityContext capabilities to add to the unsealer container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources:
     requests:
       cpu: 50m
       memory: 64Mi
 
-# @ignored
 vaultConfigurer:
+  # -- (object) SecurityContext capabilities to add to the unsealer container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources:
     requests:
       cpu: 50m
       memory: 64Mi
 
-# @ignored
 prometheusStatsdExporter:
+  # -- (object) SecurityContext capabilities to add to the statsd container
+  containerSecurityContext:
+    # -- Enable container security context
+    enabled: false
+  # @ignored
   resources:
     requests:
       cpu: 50m
@@ -469,7 +500,7 @@ tolerations: []
   #   operator: Equal
   #   value: "value"
 
-# Node affinity settings for the pods.
+# -- Node affinity settings for the pods.
 # If not set, it defaults `podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution`
 # Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/>
 affinity: {}
