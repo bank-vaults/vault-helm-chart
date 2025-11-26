@@ -21,11 +21,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
-      - name: Set up Nix
-        uses: cachix/install-nix-action@3715ab1a11cac9e991980d7b4a28d80c7ebdd8f9 # v27
+      - name: Set up Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
-          extra_nix_config: |
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          go-version-file: '.go-version'
 
       - name: Set up Go cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -37,41 +36,16 @@ jobs:
           restore-keys: |
             ${{ github.job }}-${{ runner.os }}-go-
 
-      - name: Prepare Nix shell
-        run: nix develop --impure .#ci
+      - name: Make deps
+        run: make deps
 
-      - name: Lint
-        run: nix develop --impure .#ci -c make lint -j
+      - name: Lint Helm charts
+        run: make lint-helm
 
-  dev:
-    name: Developer environment
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-
-      - name: Set up Nix
-        uses: cachix/install-nix-action@3715ab1a11cac9e991980d7b4a28d80c7ebdd8f9 # v27
-        with:
-          extra_nix_config: |
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Go cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ github.job }}-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ github.job }}-${{ runner.os }}-go-
-
-      - name: Check
-        run: nix flake check --impure
-
-      - name: Dev shell
-        run: nix develop --impure
+      - name: Run Yamllint
+        run: |
+          pip install --user yamllint
+          yamllint .
 
   artifacts:
     name: Artifacts
@@ -97,14 +71,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
-      - name: Set up Nix
-        uses: cachix/install-nix-action@3715ab1a11cac9e991980d7b4a28d80c7ebdd8f9 # v27
+      - name: Set up Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
-          extra_nix_config: |
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          go-version-file: '.go-version'
 
-      - name: Prepare Nix shell
-        run: nix develop --impure .#ci
+      - name: Make deps
+        run: make deps
 
       - name: Start kind cluster
         run: kind create cluster --image kindest/node:${{ matrix.k8s_version }} --wait 1m
@@ -115,7 +88,7 @@ jobs:
           name: "[helm-chart] package"
 
       - name: Acceptance test
-        run: nix develop --impure .#ci -c make test-acceptance
+        run: make test-acceptance
         env:
           VAULT_VERSION: ${{ matrix.vault_version }}
           HELM_CHART: "${{ github.workspace }}/${{ needs.artifacts.outputs.helm-chart-package }}"
