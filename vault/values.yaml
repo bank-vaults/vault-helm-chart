@@ -295,7 +295,7 @@ unsealer:
     # -- Container image repo that contains Bank-Vaults
     repository: bank-vaults/bank-vaults
     # -- Container image tag
-    tag: "v1.32.0"
+    tag: "v1.32.1"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
