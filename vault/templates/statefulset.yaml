@@ -91,6 +91,13 @@ spec:
           {{ else }}
           value: https://127.0.0.1:{{ .Values.service.port }}
           {{ end }}
+        {{- range .Values.vault.envSecrets }}
+        - name: {{ .envName }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .secretName }}
+              key: {{ .secretKey }}
+        {{- end }}
           {{- if .Values.vault.envs }}
 {{ toYaml .Values.vault.envs | indent 8 }}
           {{- end }}
