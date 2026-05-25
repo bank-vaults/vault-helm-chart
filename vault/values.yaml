@@ -27,7 +27,7 @@ image:
   # -- Container image repo that contains HashiCorp Vault
   repository: hashicorp/vault
   # -- Container image tag
-  tag: 1.14.8
+  tag: 2.0.2
   # -- Container image pull policy
   pullPolicy: IfNotPresent
   # -- Container image pull secrets
@@ -295,7 +295,7 @@ unsealer:
     # -- Container image repo that contains Bank-Vaults
     repository: bank-vaults/bank-vaults
     # -- Container image tag
-    tag: "v1.32.1"
+    tag: "v1.33.0"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
@@ -384,7 +384,7 @@ serviceAccount:
     # -- secret-cleanup Job image repo that contains StatsD Prometheus exporter
     repository: rancher/hyperkube
     # -- secret-cleanup Job image tag
-    tag: v1.30.2-rancher1
+    tag: v1.32.6-rancher1
     # -- secret-cleanup Job image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
