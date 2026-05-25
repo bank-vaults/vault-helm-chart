@@ -231,6 +231,18 @@ spec:
         ports:
         - containerPort: {{ .Values.unsealer.metrics.port }}
           name: "{{ .Values.unsealer.metrics.name }}"
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.unsealer.metrics.port }}
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.unsealer.metrics.port }}
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
         volumeMounts:
         - name: vault-tls
           mountPath: /vault/tls
