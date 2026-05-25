@@ -53,20 +53,28 @@ func TestVaultHelmChart(t *testing.T) {
 	kubectlOptions := k8s.NewKubectlOptions("", "", "default")
 
 	// Setup the args for helm.
+	setValues := map[string]string{
+		"unsealer.image.tag": bankVaultsVersion,
+		"unsealer.args[0]":   "--mode",
+		"unsealer.args[1]":   "k8s",
+		"unsealer.args[2]":   "--k8s-secret-namespace",
+		"unsealer.args[3]":   kubectlOptions.Namespace,
+		"unsealer.args[4]":   "--k8s-secret-name",
+		"unsealer.args[5]":   "bank-vaults",
+		"ingress.enabled":    "true",
+		"ingress.hosts[0]":   "localhost",
+		"image.tag":          vaultVersion,
+	}
+
+	// Vault 2.0.0 fails to start with `Error initializing core: Failed to lock memory`
+	// inside containers even with IPC_LOCK granted. The regression was fixed in 2.0.1.
+	if vaultVersion == "2.0.0" {
+		setValues["vault.config.disable_mlock"] = "true"
+	}
+
 	options := &helm.Options{
 		KubectlOptions: kubectlOptions,
-		SetValues: map[string]string{
-			"unsealer.image.tag": bankVaultsVersion,
-			"unsealer.args[0]":   "--mode",
-			"unsealer.args[1]":   "k8s",
-			"unsealer.args[2]":   "--k8s-secret-namespace",
-			"unsealer.args[3]":   kubectlOptions.Namespace,
-			"unsealer.args[4]":   "--k8s-secret-name",
-			"unsealer.args[5]":   "bank-vaults",
-			"ingress.enabled":    "true",
-			"ingress.hosts[0]":   "localhost",
-			"image.tag":          vaultVersion,
-		},
+		SetValues:      setValues,
 	}
 
 	chart := "../vault/"
