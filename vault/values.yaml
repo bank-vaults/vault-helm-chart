@@ -27,7 +27,7 @@ image:
   # -- Container image repo that contains HashiCorp Vault
   repository: hashicorp/vault
   # -- Container image tag
-  tag: 2.0.2
+  tag: 2.0.1
   # -- Container image pull policy
   pullPolicy: IfNotPresent
   # -- Container image pull secrets
@@ -295,7 +295,7 @@ unsealer:
     # -- Container image repo that contains Bank-Vaults
     repository: bank-vaults/bank-vaults
     # -- Container image tag
-    tag: "v1.33.0"
+    tag: "v1.33.1"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets

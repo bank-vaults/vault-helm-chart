@@ -2,7 +2,7 @@ apiVersion: v2
 type: application
 name: vault
 version: 0.0.0
-appVersion: 2.0.2
+appVersion: 2.0.1
 description: A tool for secrets management, encryption as a service, and privileged access management
 icon: https://raw.githubusercontent.com/hashicorp/vault/f22d202cde2018f9455dec755118a9b84586e082/Vault_PrimaryLogo_Black.png
 keywords:

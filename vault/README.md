@@ -146,7 +146,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `strategy.type` | string | `"RollingUpdate"` | Update strategy to use for Vault StatefulSet |
 | `image.registry` | string | `"docker.io"` | Container image registry that contains HashiCorp Vault |
 | `image.repository` | string | `"hashicorp/vault"` | Container image repo that contains HashiCorp Vault |
-| `image.tag` | string | `"2.0.2"` | Container image tag |
+| `image.tag` | string | `"2.0.1"` | Container image tag |
 | `image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `podSecurityContext` | object | `{"enabled":true,"fsGroup":65534}` | SecurityContext capabilities to add to the Vault pod |
@@ -184,7 +184,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
 | `unsealer.image.registry` | string | `"ghcr.io"` | Container image registry that contains Bank-Vaults |
 | `unsealer.image.repository` | string | `"bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
-| `unsealer.image.tag` | string | `"v1.33.0"` | Container image tag |
+| `unsealer.image.tag` | string | `"v1.33.1"` | Container image tag |
 | `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `unsealer.image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `statsd.image.registry` | string | `"docker.io"` | Container image registry that contains StatsD Prometheus exporter |
