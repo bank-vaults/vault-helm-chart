@@ -71,6 +71,22 @@ spec:
           mountPath: /vault/config/
         resources:
 {{ toYaml .Values.vaultConfig.resources | indent 10 }}
+{{- if .Values.statsd.metrics.enabled }}
+      - name: prometheus-statsd-exporter
+        image: {{ include "vault.images.image" (dict "imageRoot" .Values.statsd.image "global" .Values.global) }}
+        imagePullPolicy: {{ .Values.statsd.image.pullPolicy }}
+        restartPolicy: Always
+        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.prometheusStatsdExporter.containerSecurityContext "context" $) | nindent 10 }}
+        args: ["--statsd.mapping-config=/tmp/statsd-mapping.conf"]
+        ports:
+        - containerPort: {{ .Values.statsd.metrics.port }}
+          name: prometheus
+        volumeMounts:
+        - name: statsd-mapping
+          mountPath: /tmp/
+        resources:
+{{ toYaml .Values.prometheusStatsdExporter.resources | indent 10 }}
+{{- end }}
 {{- if .Values.extraInitContainers }}
 {{ toYaml .Values.extraInitContainers | indent 6 }}
 {{- end }}
@@ -81,16 +97,22 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["vault", "server", "-config", "/vault/config/config.json"]
         env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         - name: VAULT_CACERT
           value: /vault/tls/ca.crt
         - name: VAULT_LOG_LEVEL
           value: {{ .Values.vault.logLevel }}
         - name: VAULT_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://127.0.0.1:{{ .Values.service.port }}
-          {{ else }}
-          value: https://127.0.0.1:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://127.0.0.1:{{ .Values.service.port }}
+        - name: VAULT_API_ADDR
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://$(POD_NAME).{{ template "vault.fullname" . }}.$(POD_NAMESPACE).svc:{{ .Values.service.port }}
         {{- range .Values.vault.envSecrets }}
         - name: {{ .envName }}
           valueFrom:
@@ -115,11 +137,7 @@ spec:
         # See: https://www.vaultproject.io/api/system/init.html
         startupProbe:
           httpGet:
-            {{ if .Values.vault.config.listener.tcp.tls_disable }}
-            scheme: HTTP
-            {{ else }}
-            scheme: HTTPS
-            {{ end }}
+            scheme: {{ if .Values.vault.config.listener.tcp.tls_disable }}HTTP{{ else }}HTTPS{{ end }}
             path: /v1/sys/init
             port: vault
           periodSeconds: 10
@@ -128,24 +146,22 @@ spec:
         # See: https://www.vaultproject.io/api/system/init.html
         livenessProbe:
           httpGet:
-            {{ if .Values.vault.config.listener.tcp.tls_disable }}
-            scheme: HTTP
-            {{ else }}
-            scheme: HTTPS
-            {{ end }}
+            scheme: {{ if .Values.vault.config.listener.tcp.tls_disable }}HTTP{{ else }}HTTPS{{ end }}
             path: /v1/sys/init
             port: vault
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
         # This probe makes sure that only the active Vault instance gets traffic
         # See: https://www.vaultproject.io/api/system/health.html
         readinessProbe:
           httpGet:
-            {{ if .Values.vault.config.listener.tcp.tls_disable }}
-            scheme: HTTP
-            {{ else }}
-            scheme: HTTPS
-            {{ end }}
+            scheme: {{ if .Values.vault.config.listener.tcp.tls_disable }}HTTP{{ else }}HTTPS{{ end }}
             path: /v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=299
             port: vault
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         securityContext: {{- include "vault.bank-vaults.containerSecurityContext" . | nindent 10 }}
         volumeMounts:
         - name: vault-config
@@ -172,11 +188,7 @@ spec:
         - name: VAULT_CACERT
           value: /vault/tls/ca.crt
         - name: VAULT_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://127.0.0.1:{{ .Values.service.port }}
-          {{ else }}
-          value: https://127.0.0.1:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://127.0.0.1:{{ .Values.service.port }}
         {{- range .Values.vault.envSecrets }}
         - name: {{ .envName }}
           valueFrom:
@@ -195,6 +207,18 @@ spec:
         ports:
         - containerPort: {{ .Values.unsealer.metrics.port }}
           name: "{{ .Values.unsealer.metrics.name }}"
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.unsealer.metrics.port }}
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.unsealer.metrics.port }}
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
         volumeMounts:
         - name: vault-tls
           mountPath: /vault/tls
@@ -214,11 +238,7 @@ spec:
         - name: VAULT_CACERT
           value: /vault/tls/ca.crt
         - name: VAULT_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://127.0.0.1:{{ .Values.service.port }}
-          {{ else }}
-          value: https://127.0.0.1:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://127.0.0.1:{{ .Values.service.port }}
         {{- range .Values.vault.envSecrets }}
         - name: {{ .envName }}
           valueFrom:
@@ -246,21 +266,6 @@ spec:
         {{- end }}
         resources:
 {{ toYaml .Values.vaultConfigurer.resources | indent 10 }}
-{{- if .Values.statsd.metrics.enabled }}
-      - name: prometheus-statsd-exporter
-        image: {{ include "vault.images.image" (dict "imageRoot" .Values.statsd.image "global" .Values.global) }}
-        imagePullPolicy: {{ .Values.statsd.image.pullPolicy }}
-        securityContext: {{- include "vault.compatibility.renderSecurityContext" (dict "secContext" .Values.prometheusStatsdExporter.containerSecurityContext "context" $) | nindent 10 }}
-        args: ["--statsd.mapping-config=/tmp/statsd-mapping.conf"]
-        ports:
-        - containerPort: {{ .Values.statsd.metrics.port }}
-          name: prometheus
-        volumeMounts:
-        - name: statsd-mapping
-          mountPath: /tmp/
-        resources:
-{{ toYaml .Values.prometheusStatsdExporter.resources | indent 10 }}
-{{- end }}
 {{- if .Values.extraContainers }}
 {{ toYaml .Values.extraContainers | indent 6}}
 {{- end }}

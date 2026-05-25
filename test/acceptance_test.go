@@ -20,6 +20,7 @@
 package test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -30,7 +31,7 @@ import (
 
 var (
 	vaultVersion      = "latest"
-	bankVaultsVersion = "v1.32.1"
+	bankVaultsVersion = "v1.33.1"
 )
 
 // Installing the operator helm chart before testing
@@ -52,20 +53,28 @@ func TestVaultHelmChart(t *testing.T) {
 	kubectlOptions := k8s.NewKubectlOptions("", "", "default")
 
 	// Setup the args for helm.
+	setValues := map[string]string{
+		"unsealer.image.tag": bankVaultsVersion,
+		"unsealer.args[0]":   "--mode",
+		"unsealer.args[1]":   "k8s",
+		"unsealer.args[2]":   "--k8s-secret-namespace",
+		"unsealer.args[3]":   kubectlOptions.Namespace,
+		"unsealer.args[4]":   "--k8s-secret-name",
+		"unsealer.args[5]":   "bank-vaults",
+		"ingress.enabled":    "true",
+		"ingress.hosts[0]":   "localhost",
+		"image.tag":          vaultVersion,
+	}
+
+	// Vault 2.0.0 fails to start with `Error initializing core: Failed to lock memory`
+	// inside containers even with IPC_LOCK granted. The regression was fixed in 2.0.1.
+	if vaultVersion == "2.0.0" {
+		setValues["vault.config.disable_mlock"] = "true"
+	}
+
 	options := &helm.Options{
 		KubectlOptions: kubectlOptions,
-		SetValues: map[string]string{
-			"unsealer.image.tag": bankVaultsVersion,
-			"unsealer.args[0]":   "--mode",
-			"unsealer.args[1]":   "k8s",
-			"unsealer.args[2]":   "--k8s-secret-namespace",
-			"unsealer.args[3]":   kubectlOptions.Namespace,
-			"unsealer.args[4]":   "--k8s-secret-name",
-			"unsealer.args[5]":   "bank-vaults",
-			"ingress.enabled":    "true",
-			"ingress.hosts[0]":   "localhost",
-			"image.tag":          vaultVersion,
-		},
+		SetValues:      setValues,
 	}
 
 	chart := "../vault/"
@@ -75,8 +84,70 @@ func TestVaultHelmChart(t *testing.T) {
 
 	// Deploy the chart using `helm install`
 	helm.Install(t, options, chart, releaseName)
-	defer helm.Delete(t, options, releaseName, true)
+	t.Cleanup(func() {
+		if t.Failed() {
+			dumpDiagnostics(t, kubectlOptions, "vault-0")
+		}
+		helm.Delete(t, options, releaseName, true)
+	})
 
 	// Check the Vault pod to be up and running
-	k8s.WaitUntilPodAvailable(t, kubectlOptions, "vault-0", 5, 10*time.Second)
+	k8s.WaitUntilPodAvailable(t, kubectlOptions, "vault-0", 60, 5*time.Second)
+}
+
+// dumpDiagnostics writes Kubernetes state to the test log to help debug failures
+func dumpDiagnostics(t *testing.T, kubectlOptions *k8s.KubectlOptions, podName string) {
+	t.Helper()
+
+	t.Logf("===== diagnostics for pod %q in namespace %q =====", podName, kubectlOptions.Namespace)
+
+	runKubectl(t, kubectlOptions, "events", "get", "events", "--sort-by=.lastTimestamp")
+	runKubectl(t, kubectlOptions, "describe pod "+podName, "describe", "pod", podName)
+
+	pod, err := k8s.GetPodE(t, kubectlOptions, podName)
+	if err != nil {
+		t.Logf("could not fetch pod %q to enumerate containers: %v", podName, err)
+		t.Logf("===== end diagnostics =====")
+		return
+	}
+
+	for _, c := range pod.Spec.InitContainers {
+		dumpContainerLogs(t, kubectlOptions, podName, c.Name, true)
+	}
+	for _, c := range pod.Spec.Containers {
+		dumpContainerLogs(t, kubectlOptions, podName, c.Name, false)
+	}
+
+	t.Logf("===== end diagnostics =====")
+}
+
+func dumpContainerLogs(t *testing.T, kubectlOptions *k8s.KubectlOptions, podName, container string, init bool) {
+	t.Helper()
+
+	kind := "container"
+	if init {
+		kind = "init-container"
+	}
+
+	// Current logs.
+	runKubectl(t, kubectlOptions,
+		fmt.Sprintf("logs %s/%s (%s)", podName, container, kind),
+		"logs", podName, "-c", container, "--tail=500",
+	)
+
+	// Previous instance — only meaningful if it has restarted. Skipped quietly otherwise.
+	runKubectl(t, kubectlOptions,
+		fmt.Sprintf("logs %s/%s (%s, previous)", podName, container, kind),
+		"logs", podName, "-c", container, "--tail=500", "--previous",
+	)
+}
+
+func runKubectl(t *testing.T, kubectlOptions *k8s.KubectlOptions, title string, args ...string) {
+	t.Helper()
+	out, err := k8s.RunKubectlAndGetOutputE(t, kubectlOptions, args...)
+	if err != nil {
+		t.Logf("----- %s: %v -----\n%s", title, err, out)
+		return
+	}
+	t.Logf("----- %s -----\n%s", title, out)
 }

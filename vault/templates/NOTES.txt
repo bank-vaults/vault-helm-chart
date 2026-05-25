@@ -15,3 +15,22 @@
   echo "Use http://127.0.0.1:8200 as the Vault address after forwarding."
   kubectl port-forward $POD_NAME 8200:{{ .Values.service.port }}
 {{- end }}
+
+{{- if not .Values.persistence.enabled }}
+
+##############################################################################
+WARNING: Persistence is DISABLED (persistence.enabled=false).
+
+  Vault is using an emptyDir for /vault/file. ALL vault data (including the
+  initialization keys, unseal keys, secrets and any policies) will be LOST
+  the moment the vault-0 pod is deleted, restarted, or rescheduled to
+  another node.
+
+For persistent use:
+
+      helm upgrade vault ... \
+        --set persistence.enabled=true \
+        --set persistence.size=10Gi \
+        --set persistence.storageClass=<your-storage-class>
+##############################################################################
+{{- end }}

@@ -146,7 +146,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `strategy.type` | string | `"RollingUpdate"` | Update strategy to use for Vault StatefulSet |
 | `image.registry` | string | `"docker.io"` | Container image registry that contains HashiCorp Vault |
 | `image.repository` | string | `"hashicorp/vault"` | Container image repo that contains HashiCorp Vault |
-| `image.tag` | string | `"1.14.8"` | Container image tag |
+| `image.tag` | string | `"2.0.1"` | Container image tag |
 | `image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `podSecurityContext` | object | `{"enabled":true,"fsGroup":65534}` | SecurityContext capabilities to add to the Vault pod |
@@ -184,12 +184,12 @@ The following table lists the configurable parameters of the Helm chart.
 | `vault.externalConfig` | object | `{}` | A YAML representation of dynamic config data used by Bank-Vaults. Bank-Vaults will use this data to continuously configure Vault. Check: <https://bank-vaults.dev/docs/external-configuration/> |
 | `unsealer.image.registry` | string | `"ghcr.io"` | Container image registry that contains Bank-Vaults |
 | `unsealer.image.repository` | string | `"bank-vaults/bank-vaults"` | Container image repo that contains Bank-Vaults |
-| `unsealer.image.tag` | string | `"v1.32.0"` | Container image tag |
+| `unsealer.image.tag` | string | `"v1.33.1"` | Container image tag |
 | `unsealer.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `unsealer.image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `statsd.image.registry` | string | `"docker.io"` | Container image registry that contains StatsD Prometheus exporter |
 | `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
-| `statsd.image.tag` | string | `"latest"` | Container image tag |
+| `statsd.image.tag` | string | `"v0.29.0"` | Container image tag |
 | `statsd.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `statsd.image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `rbac.psp.enabled` | bool | `false` | Use pod security policy |
@@ -197,10 +197,10 @@ The following table lists the configurable parameters of the Helm chart.
 | `serviceAccount.name` | string | `""` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. |
 | `serviceAccount.annotations` | object | `{}` | Annotations to add to the service account. For example, use `iam.gke.io/gcp-service-account: gsa@project.iam.gserviceaccount.com` to enable GKE workload identity. |
 | `serviceAccount.createClusterRoleBinding` | bool | `true` | Bind `system:auth-delegator` ClusterRoleBinding to this service account |
-| `serviceAccount.secretCleanupImage` | object | `{"pullPolicy":"IfNotPresent","pullSecrets":[],"registry":"docker.io","repository":"rancher/hyperkube","tag":"v1.30.2-rancher1"}` | secret-cleanup Job image |
-| `serviceAccount.secretCleanupImage.registry` | string | `"docker.io"` | secret-cleanup Job image registry that contains StatsD Prometheus exporter |
-| `serviceAccount.secretCleanupImage.repository` | string | `"rancher/hyperkube"` | secret-cleanup Job image repo that contains StatsD Prometheus exporter |
-| `serviceAccount.secretCleanupImage.tag` | string | `"v1.30.2-rancher1"` | secret-cleanup Job image tag |
+| `serviceAccount.secretCleanupImage` | object | `{"pullPolicy":"IfNotPresent","pullSecrets":[],"registry":"docker.io","repository":"alpine/k8s","tag":"1.35.5"}` | secret-cleanup Job image. Used by the pre-delete hook to run `kubectl delete secret` for the bank-vaults init/unseal keys on `helm uninstall`. |
+| `serviceAccount.secretCleanupImage.registry` | string | `"docker.io"` | secret-cleanup Job image registry |
+| `serviceAccount.secretCleanupImage.repository` | string | `"alpine/k8s"` | secret-cleanup Job image repo. Defaults to `alpine/k8s` (~50MB, includes kubectl). |
+| `serviceAccount.secretCleanupImage.tag` | string | `"1.35.5"` | secret-cleanup Job image tag |
 | `serviceAccount.secretCleanupImage.pullPolicy` | string | `"IfNotPresent"` | secret-cleanup Job image pull policy |
 | `serviceAccount.secretCleanupImage.pullSecrets` | list | `[]` | Container image pull secrets |
 | `vaultConfig.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the unsealer container |
@@ -219,7 +219,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `resources` | object | `{}` | Resources to request for Vault |
 | `nodeSelector` | object | `{}` | Node labels for pod assignment. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector> |
 | `tolerations` | list | `[]` | List of node tolerations for the pods. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/> |
-| `affinity` | object | `{}` |  |
+| `affinity` | object | `{}` | Node affinity settings for the pods. If not set, it defaults `podAntiAffinity` to `preferredDuringSchedulingIgnoredDuringExecution` Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/> |
 | `priorityClassName` | string | `""` | Assign a PriorityClassName to pods if set. Check: <https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/> |
 | `kubeVersion` | string | `""` | Override cluster version |
 

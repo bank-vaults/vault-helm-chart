@@ -1,6 +1,6 @@
 module github.com/bank-vaults/vault-helm-chart
 
-go 1.26.0
+go 1.26.3
 
 require github.com/gruntwork-io/terratest v1.0.0
 

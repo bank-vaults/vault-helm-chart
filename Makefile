@@ -66,8 +66,8 @@ deps: bin/kind bin/helm bin/helm-docs
 deps: ## Install dependencies
 
 # Dependency versions
-KIND_VERSION = 0.30.0
-HELM_VERSION = 4.0.1
+KIND_VERSION = 0.31.0
+HELM_VERSION = 4.2.0
 HELM_DOCS_VERSION = 1.14.2
 
 # Dependency binaries

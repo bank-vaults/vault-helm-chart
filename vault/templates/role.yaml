@@ -12,11 +12,7 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
-  resourceNames: ["bank-vaults"]
-  verbs: ["*"]
-- apiGroups: [""]
-  resources: ["secrets"]
-  resourceNames: ["vault-unseal-keys"]
+  resourceNames: [{{ include "vault.unsealer.secretName" . | quote }}]
   verbs: ["*"]
 - apiGroups: [""]
   resources: ["secrets"]

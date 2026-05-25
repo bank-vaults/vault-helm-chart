@@ -27,7 +27,7 @@ image:
   # -- Container image repo that contains HashiCorp Vault
   repository: hashicorp/vault
   # -- Container image tag
-  tag: 1.14.8
+  tag: 2.0.1
   # -- Container image pull policy
   pullPolicy: IfNotPresent
   # -- Container image pull secrets
@@ -295,7 +295,7 @@ unsealer:
     # -- Container image repo that contains Bank-Vaults
     repository: bank-vaults/bank-vaults
     # -- Container image tag
-    tag: "v1.32.1"
+    tag: "v1.33.1"
     # -- Container image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
@@ -336,7 +336,7 @@ statsd:
     # -- Container image repo that contains StatsD Prometheus exporter
     repository: prom/statsd-exporter
     # -- Container image tag
-    tag: latest
+    tag: v0.29.0
     # -- Container image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
@@ -377,14 +377,15 @@ serviceAccount:
   annotations: {}
   # -- Bind `system:auth-delegator` ClusterRoleBinding to this service account
   createClusterRoleBinding: true
-  # -- secret-cleanup Job image
+  # -- secret-cleanup Job image. Used by the pre-delete hook to run `kubectl delete secret`
+  # for the bank-vaults init/unseal keys on `helm uninstall`.
   secretCleanupImage:
-    # -- secret-cleanup Job image registry that contains StatsD Prometheus exporter
+    # -- secret-cleanup Job image registry
     registry: docker.io
-    # -- secret-cleanup Job image repo that contains StatsD Prometheus exporter
-    repository: rancher/hyperkube
+    # -- secret-cleanup Job image repo. Defaults to `alpine/k8s` (~50MB, includes kubectl).
+    repository: alpine/k8s
     # -- secret-cleanup Job image tag
-    tag: v1.30.2-rancher1
+    tag: "1.35.5"
     # -- secret-cleanup Job image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
