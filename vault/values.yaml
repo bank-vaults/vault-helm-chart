@@ -377,14 +377,15 @@ serviceAccount:
   annotations: {}
   # -- Bind `system:auth-delegator` ClusterRoleBinding to this service account
   createClusterRoleBinding: true
-  # -- secret-cleanup Job image
+  # -- secret-cleanup Job image. Used by the pre-delete hook to run `kubectl delete secret`
+  # for the bank-vaults init/unseal keys on `helm uninstall`.
   secretCleanupImage:
-    # -- secret-cleanup Job image registry that contains StatsD Prometheus exporter
+    # -- secret-cleanup Job image registry
     registry: docker.io
-    # -- secret-cleanup Job image repo that contains StatsD Prometheus exporter
-    repository: rancher/hyperkube
+    # -- secret-cleanup Job image repo. Defaults to `alpine/k8s` (~50MB, includes kubectl).
+    repository: alpine/k8s
     # -- secret-cleanup Job image tag
-    tag: v1.32.6-rancher1
+    tag: "1.35.5"
     # -- secret-cleanup Job image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
