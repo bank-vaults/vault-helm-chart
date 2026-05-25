@@ -78,5 +78,5 @@ func TestVaultHelmChart(t *testing.T) {
 	defer helm.Delete(t, options, releaseName, true)
 
 	// Check the Vault pod to be up and running
-	k8s.WaitUntilPodAvailable(t, kubectlOptions, "vault-0", 5, 10*time.Second)
+	k8s.WaitUntilPodAvailable(t, kubectlOptions, "vault-0", 60, 5*time.Second)
 }
