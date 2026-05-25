@@ -189,7 +189,7 @@ The following table lists the configurable parameters of the Helm chart.
 | `unsealer.image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `statsd.image.registry` | string | `"docker.io"` | Container image registry that contains StatsD Prometheus exporter |
 | `statsd.image.repository` | string | `"prom/statsd-exporter"` | Container image repo that contains StatsD Prometheus exporter |
-| `statsd.image.tag` | string | `"latest"` | Container image tag |
+| `statsd.image.tag` | string | `"v0.29.0"` | Container image tag |
 | `statsd.image.pullPolicy` | string | `"IfNotPresent"` | Container image pull policy |
 | `statsd.image.pullSecrets` | list | `[]` | Container image pull secrets |
 | `rbac.psp.enabled` | bool | `false` | Use pod security policy |

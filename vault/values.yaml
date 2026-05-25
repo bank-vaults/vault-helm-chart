@@ -336,7 +336,7 @@ statsd:
     # -- Container image repo that contains StatsD Prometheus exporter
     repository: prom/statsd-exporter
     # -- Container image tag
-    tag: latest
+    tag: v0.29.0
     # -- Container image pull policy
     pullPolicy: IfNotPresent
     # -- Container image pull secrets
