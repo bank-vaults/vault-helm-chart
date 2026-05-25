@@ -110,6 +110,28 @@ This function adapts the security context by adding the IPC_LOCK capability if `
 {{- end -}}
 
 {{/*
+Return the name of the Kubernetes Secret that bank-vaults uses to persist
+init/unseal keys. Parsed from `unsealer.args` (the value following the
+`--k8s-secret-name` flag). Falls back to `bank-vaults` if the flag isn't set.
+
+This is the single source of truth: the cleanup hook (`secret-cleanup.yaml`)
+and the RBAC `Role` (`role.yaml`) derive the secret name from here so that
+overriding `unsealer.args` automatically keeps cleanup + RBAC in sync.
+*/}}
+{{- define "vault.unsealer.secretName" -}}
+{{- $state := dict "capture" false "result" "bank-vaults" -}}
+{{- range $arg := .Values.unsealer.args -}}
+  {{- if $state.capture -}}
+    {{- $_ := set $state "result" $arg -}}
+    {{- $_ := set $state "capture" false -}}
+  {{- else if eq (toString $arg) "--k8s-secret-name" -}}
+    {{- $_ := set $state "capture" true -}}
+  {{- end -}}
+{{- end -}}
+{{- $state.result -}}
+{{- end -}}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "vault.imagePullSecrets" -}}
