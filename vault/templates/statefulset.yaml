@@ -110,17 +110,9 @@ spec:
         - name: VAULT_LOG_LEVEL
           value: {{ .Values.vault.logLevel }}
         - name: VAULT_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://127.0.0.1:{{ .Values.service.port }}
-          {{ else }}
-          value: https://127.0.0.1:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://127.0.0.1:{{ .Values.service.port }}
         - name: VAULT_API_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://$(POD_NAME).{{ template "vault.fullname" . }}.$(POD_NAMESPACE).svc:{{ .Values.service.port }}
-          {{ else }}
-          value: https://$(POD_NAME).{{ template "vault.fullname" . }}.$(POD_NAMESPACE).svc:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://$(POD_NAME).{{ template "vault.fullname" . }}.$(POD_NAMESPACE).svc:{{ .Values.service.port }}
         {{- range .Values.vault.envSecrets }}
         - name: {{ .envName }}
           valueFrom:
@@ -145,11 +137,7 @@ spec:
         # See: https://www.vaultproject.io/api/system/init.html
         startupProbe:
           httpGet:
-            {{ if .Values.vault.config.listener.tcp.tls_disable }}
-            scheme: HTTP
-            {{ else }}
-            scheme: HTTPS
-            {{ end }}
+            scheme: {{ if .Values.vault.config.listener.tcp.tls_disable }}HTTP{{ else }}HTTPS{{ end }}
             path: /v1/sys/init
             port: vault
           periodSeconds: 10
@@ -158,11 +146,7 @@ spec:
         # See: https://www.vaultproject.io/api/system/init.html
         livenessProbe:
           httpGet:
-            {{ if .Values.vault.config.listener.tcp.tls_disable }}
-            scheme: HTTP
-            {{ else }}
-            scheme: HTTPS
-            {{ end }}
+            scheme: {{ if .Values.vault.config.listener.tcp.tls_disable }}HTTP{{ else }}HTTPS{{ end }}
             path: /v1/sys/init
             port: vault
           periodSeconds: 30
@@ -172,11 +156,7 @@ spec:
         # See: https://www.vaultproject.io/api/system/health.html
         readinessProbe:
           httpGet:
-            {{ if .Values.vault.config.listener.tcp.tls_disable }}
-            scheme: HTTP
-            {{ else }}
-            scheme: HTTPS
-            {{ end }}
+            scheme: {{ if .Values.vault.config.listener.tcp.tls_disable }}HTTP{{ else }}HTTPS{{ end }}
             path: /v1/sys/health?standbyok=true&perfstandbyok=true&drsecondarycode=299
             port: vault
           periodSeconds: 10
@@ -208,11 +188,7 @@ spec:
         - name: VAULT_CACERT
           value: /vault/tls/ca.crt
         - name: VAULT_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://127.0.0.1:{{ .Values.service.port }}
-          {{ else }}
-          value: https://127.0.0.1:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://127.0.0.1:{{ .Values.service.port }}
         {{- range .Values.vault.envSecrets }}
         - name: {{ .envName }}
           valueFrom:
@@ -262,11 +238,7 @@ spec:
         - name: VAULT_CACERT
           value: /vault/tls/ca.crt
         - name: VAULT_ADDR
-        {{ if .Values.vault.config.listener.tcp.tls_disable }}
-          value: http://127.0.0.1:{{ .Values.service.port }}
-          {{ else }}
-          value: https://127.0.0.1:{{ .Values.service.port }}
-          {{ end }}
+          value: {{ if .Values.vault.config.listener.tcp.tls_disable }}http{{ else }}https{{ end }}://127.0.0.1:{{ .Values.service.port }}
         {{- range .Values.vault.envSecrets }}
         - name: {{ .envName }}
           valueFrom:
