@@ -391,7 +391,13 @@ serviceAccount:
     # -- Container image pull secrets
     pullSecrets: []
       # - name: myregistrykey
+    # -- Resources to request for the secret-cleanup Job container
+    resources: {}
 
+# -- Configuration for the `test-vault-status` Helm test hook Pod
+testVaultStatus:
+  # -- Resources to request for the test-vault-status container
+  resources: {}
 
 vaultConfig:
   # -- (object) SecurityContext capabilities to add to the unsealer container
