@@ -203,6 +203,8 @@ The following table lists the configurable parameters of the Helm chart.
 | `serviceAccount.secretCleanupImage.tag` | string | `"1.35.5"` | secret-cleanup Job image tag |
 | `serviceAccount.secretCleanupImage.pullPolicy` | string | `"IfNotPresent"` | secret-cleanup Job image pull policy |
 | `serviceAccount.secretCleanupImage.pullSecrets` | list | `[]` | Container image pull secrets |
+| `serviceAccount.secretCleanupImage.resources` | object | `{}` | Resources to request for the secret-cleanup Job container |
+| `testVaultStatus.resources` | object | `{}` | Resources to request for the test-vault-status container |
 | `vaultConfig.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the unsealer container |
 | `vaultConfig.containerSecurityContext.enabled` | bool | `false` | Enable container security context |
 | `vaultUnsealer.containerSecurityContext` | object | `{"enabled":false}` | SecurityContext capabilities to add to the unsealer container |

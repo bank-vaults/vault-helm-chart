@@ -19,4 +19,6 @@ spec:
         value: https://{{ template "vault.fullname" . }}:8200
       {{- end }}
     command: ["sh", "-c", "vault status"]
+    resources:
+{{ toYaml .Values.testVaultStatus.resources | indent 6 }}
   restartPolicy: Never
